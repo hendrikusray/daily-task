@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}Login — Marianne Tracker{% endblock %}
+
+{% block content %}
+<div class="auth-scene">
+    <div class="auth-container">
+        <div class="auth-logo">
+            <div class="auth-logo-mark">
+                <svg viewBox="0 0 42 42" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <ellipse cx="21" cy="8" rx="5" ry="11" fill="white" opacity="0.95" transform="rotate(0 21 21)"/>
+                    <ellipse cx="21" cy="8" rx="4.5" ry="10" fill="white" opacity="0.78" transform="rotate(72 21 21)"/>
+                    <ellipse cx="21" cy="8" rx="5" ry="11" fill="white" opacity="0.92" transform="rotate(144 21 21)"/>
+                    <ellipse cx="21" cy="8" rx="4.5" ry="10" fill="white" opacity="0.78" transform="rotate(216 21 21)"/>
+                    <ellipse cx="21" cy="8" rx="5" ry="11" fill="white" opacity="0.92" transform="rotate(288 21 21)"/>
+                    <circle cx="21" cy="21" r="5" fill="rgba(255,243,224,0.95)"/>
+                    <circle cx="21" cy="21" r="2.4" fill="rgba(192,122,48,0.9)"/>
+                </svg>
+            </div>
+        </div>
+
+        <h2>Selamat Datang</h2>
+        <p class="auth-subtitle">Masuk ke Tracker kamu</p>
+
+        <form method="POST">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username"
+                       placeholder="Username kamu..." autocomplete="username" required>
+            </div>
+            <div class="form-group password-wrapper">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password"
+                       placeholder="Password kamu..." autocomplete="current-password" required>
+                <span class="password-toggle" onclick="togglePasswordVisibility('password')">👁️</span>
+            </div>
+            <button type="submit" class="btn btn-primary auth-submit">
+                Masuk
+            </button>
+        </form>
+<!-- 
+        <div class="auth-link">
+            Belum punya akun? <a href="{{ url_for('register') }}">Daftar di sini</a>
+        </div> -->
+    </div>
+</div>
+{% endblock %}

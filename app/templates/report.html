@@ -1,0 +1,198 @@
+{% extends "base.html" %}
+
+{% block title %}Report Campaign — Marianne Tracker{% endblock %}
+
+{% block content %}
+<div class="tracker-page">
+
+    <!-- Header -->
+    <section class="tracker-header">
+        <div class="header-title">
+            <div class="header-avatar">📊</div>
+            <div>
+                <span class="eyebrow">📊 Report</span>
+                <h1>Report Campaign</h1>
+                <p>Filter campaign berdasarkan periode, category, brand, payment, platform & status.</p>
+            </div>
+        </div>
+        <div class="header-actions">
+            <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">🌸 Dashboard</a>
+            <a href="{{ url_for('buat_konten') }}" class="btn btn-primary">✨ Tambah Campaign</a>
+        </div>
+    </section>
+
+    <!-- Filter Form -->
+    <form method="GET" class="report-filter">
+        <div class="filter-title">
+            🔍 Filter Campaign
+        </div>
+        <div class="filter-grid">
+            <!-- Date range -->
+            <div class="form-group-full">
+                <label for="start_date">📅 Dari Tanggal</label>
+                <input type="text" id="start_date" name="start_date"
+                       class="datepicker"
+                       value="{{ filters.start_date }}"
+                       placeholder="Pilih tanggal mulai...">
+            </div>
+            <div class="form-group-full">
+                <label for="end_date">📅 Sampai Tanggal</label>
+                <input type="text" id="end_date" name="end_date"
+                       class="datepicker"
+                       value="{{ filters.end_date }}"
+                       placeholder="Pilih tanggal akhir...">
+            </div>
+
+            <!-- Category -->
+            <div class="form-group-full">
+                <label for="category">🏷️ Category</label>
+                <select id="category" name="category">
+                    <option value="">Semua Category</option>
+                    {% for option in category_options %}
+                        <option value="{{ option }}" {% if filters.category == option %}selected{% endif %}>{{ option }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Brand -->
+            <div class="form-group-full">
+                <label for="brand">💼 Brand</label>
+                <select id="brand" name="brand">
+                    <option value="">Semua Brand</option>
+                    {% for option in brand_options %}
+                        <option value="{{ option }}" {% if filters.brand == option %}selected{% endif %}>{{ option }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Payment -->
+            <div class="form-group-full">
+                <label for="payment">💳 Payment</label>
+                <select id="payment" name="payment">
+                    <option value="">Semua Payment</option>
+                    {% for option in payment_options %}
+                        <option value="{{ option }}" {% if filters.payment == option %}selected{% endif %}>{{ option }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Platform -->
+            <div class="form-group-full">
+                <label for="platform">📱 Platform</label>
+                <select id="platform" name="platform">
+                    <option value="">Semua Platform</option>
+                    {% for option in platform_options %}
+                        <option value="{{ option }}" {% if filters.platform == option %}selected{% endif %}>{{ option }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Status -->
+            <div class="form-group-full">
+                <label for="status">🔖 Status</label>
+                <select id="status" name="status">
+                    <option value="">Semua Status</option>
+                    {% for option in status_options %}
+                        <option value="{{ option }}" {% if filters.status == option %}selected{% endif %}>{{ option }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Actions -->
+            <div class="filter-actions">
+                <button type="submit" class="btn btn-primary">🔍 Terapkan</button>
+                <a href="{{ url_for('report') }}" class="btn btn-secondary">↺ Reset</a>
+            </div>
+        </div>
+    </form>
+
+    <!-- Summary Stats -->
+    <section class="stat-grid" aria-label="Ringkasan report">
+        <div class="stat-card stat-card-total">
+            <div class="stat-icon">📋</div>
+            <div class="stat-label">Hasil Report</div>
+            <div class="stat-value">{{ total_results }}</div>
+        </div>
+        <div class="stat-card stat-card-warning">
+            <div class="stat-icon">⏰</div>
+            <div class="stat-label">Deadline H-5</div>
+            <div class="stat-value">{{ due_soon_count }}</div>
+        </div>
+        <div class="stat-card stat-card-success">
+            <div class="stat-icon">✅</div>
+            <div class="stat-label">Selesai</div>
+            <div class="stat-value">{{ done_count }}</div>
+        </div>
+    </section>
+
+    <!-- Results Table -->
+    <div class="sheet-card">
+        <div class="sheet-toolbar">
+            <div>
+                <span class="eyebrow">📊 Filtered Data</span>
+                <h2>Hasil Report</h2>
+            </div>
+            {% if total_results > 0 %}
+            <span class="deadline-legend">{{ total_results }} data ditemukan</span>
+            {% endif %}
+        </div>
+
+        <div class="tracker-table-wrap">
+            <table class="tracker-table">
+                <thead>
+                    <tr>
+                        <th>Category</th>
+                        <th>Brand</th>
+                        <th>Campaign / Project</th>
+                        <th>Payment</th>
+                        <th>Fee</th>
+                        <th>SOW</th>
+                        <th>Platform</th>
+                        <th>Status</th>
+                        <th>Deadline</th>
+                        <th>Product Knowledge</th>
+                        <th>Link Content</th>
+                        <th>Note</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for k in results %}
+                    {% set status_class = (k.status or 'none')|lower|replace(' ', '-')|replace("'", '') %}
+                    <tr class="deadline-{{ k.deadline_state }}">
+                        <td data-label="Category">
+                            <span class="data-pill">{{ k.category or '-' }}</span>
+                        </td>
+                        <td data-label="Brand">{{ k.brand or '-' }}</td>
+                        <td data-label="Campaign/Project" class="strong-cell">{{ k.campaign_project or k.judul }}</td>
+                        <td data-label="Payment">
+                            <span class="payment-badge payment-{{ (k.payment or 'none')|lower }}">{{ k.payment or '-' }}</span>
+                        </td>
+                        <td data-label="Fee">{{ k.fee or '-' }}</td>
+                        <td data-label="SOW" class="truncate-cell">{{ k.sow or '-' }}</td>
+                        <td data-label="Platform">
+                            <span class="data-pill platform-pill">{{ k.platform or '-' }}</span>
+                        </td>
+                        <td data-label="Status">
+                            <span class="status-badge status-{{ status_class }}">{{ k.status or '-' }}</span>
+                        </td>
+                        <td data-label="Deadline" class="deadline-cell">{{ k.deadline_text }}</td>
+                        <td data-label="Product Knowledge" class="truncate-cell">{{ k.product_knowledge or '-' }}</td>
+                        <td data-label="Link Content">
+                            {% if k.link_content %}
+                                <a href="{{ k.link_content }}" target="_blank" rel="noopener" class="table-link">🔗 Buka</a>
+                            {% else %}-{% endif %}
+                        </td>
+                        <td data-label="Note" class="truncate-cell">{{ k.note or '-' }}</td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="12" class="empty-row">🔍 Belum ada data sesuai filter.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

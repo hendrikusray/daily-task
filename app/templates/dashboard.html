@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard — Marianne Tracker{% endblock %}
+
+{% block content %}
+{% set display_name = current_user.username|replace('.', ' ')|title %}
+<div class="tracker-page">
+
+    <!-- Header -->
+    <section class="tracker-header">
+        <div class="header-title">
+            <div class="header-avatar">{{ current_user.username[0].upper() }}</div>
+            <div>
+                <span class="eyebrow">✨ Campaign Tracker</span>
+                <h1>Halo, {{ display_name }} 💕</h1>
+                <p>Semua campaign diurutkan dari deadline terdekat.</p>
+            </div>
+        </div>
+        <div class="header-actions">
+            <a href="{{ url_for('report') }}" class="btn btn-secondary">📊 Report</a>
+            <a href="{{ url_for('buat_konten') }}" class="btn btn-primary">✨ Tambah Campaign</a>
+        </div>
+    </section>
+
+    <!-- Stat Cards -->
+    <section class="stat-grid" aria-label="Ringkasan campaign">
+        <div class="stat-card stat-card-total">
+            <div class="stat-icon">📋</div>
+            <div class="stat-label">Total Campaign</div>
+            <div class="stat-value">{{ total_konten }}</div>
+        </div>
+        <div class="stat-card stat-card-warning">
+            <div class="stat-icon">⏰</div>
+            <div class="stat-label">Deadline H-5</div>
+            <div class="stat-value">{{ due_soon_count }}</div>
+        </div>
+        <div class="stat-card stat-card-success">
+            <div class="stat-icon">✅</div>
+            <div class="stat-label">Selesai</div>
+            <div class="stat-value">{{ done_count }}</div>
+        </div>
+    </section>
+
+    <!-- Table -->
+    {% if konten_list.items %}
+    <div class="sheet-card">
+        <div class="sheet-toolbar">
+            <div>
+                <span class="eyebrow">🌸 Workspace</span>
+                <h2>Daftar Campaign</h2>
+            </div>
+            <span class="deadline-legend">⏰ Kuning = deadline H-5 atau kurang</span>
+        </div>
+
+        <div class="tracker-table-wrap">
+            <table class="tracker-table">
+                <thead>
+                    <tr>
+                        <th>Category</th>
+                        <th>Brand</th>
+                        <th>Campaign / Project</th>
+                        <th>Payment</th>
+                        <th>Fee</th>
+                        <th>SOW</th>
+                        <th>Platform</th>
+                        <th>Status</th>
+                        <th>Deadline</th>
+                        <th>Product Knowledge</th>
+                        <th>Link Content</th>
+                        <th>Note</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for k in konten_list.items %}
+                    {% set status_class = (k.status or 'none')|lower|replace(' ', '-')|replace("'", '') %}
+                    <tr class="deadline-{{ k.deadline_state }}">
+                        <td data-label="Category">
+                            <span class="data-pill">{{ k.category or '-' }}</span>
+                        </td>
+                        <td data-label="Brand">{{ k.brand or '-' }}</td>
+                        <td data-label="Campaign/Project" class="strong-cell">{{ k.campaign_project or k.judul }}</td>
+                        <td data-label="Payment">
+                            <span class="payment-badge payment-{{ (k.payment or 'none')|lower }}">
+                                {{ k.payment or '-' }}
+                            </span>
+                        </td>
+                        <td data-label="Fee">{{ k.fee or '-' }}</td>
+                        <td data-label="SOW" class="truncate-cell">{{ k.sow or '-' }}</td>
+                        <td data-label="Platform">
+                            <span class="data-pill platform-pill">{{ k.platform or '-' }}</span>
+                        </td>
+                        <td data-label="Status">
+                            <span class="status-badge status-{{ status_class }}">{{ k.status or '-' }}</span>
+                        </td>
+                        <td data-label="Deadline" class="deadline-cell">{{ k.deadline_text }}</td>
+                        <td data-label="Product Knowledge" class="truncate-cell">{{ k.product_knowledge or '-' }}</td>
+                        <td data-label="Link Content">
+                            {% if k.link_content %}
+                                <a href="{{ k.link_content }}" target="_blank" rel="noopener" class="table-link">🔗 Buka</a>
+                            {% else %}-{% endif %}
+                        </td>
+                        <td data-label="Note" class="truncate-cell">{{ k.note or '-' }}</td>
+                        <td data-label="Aksi">
+                            <div class="table-actions">
+                                <a href="{{ url_for('edit_konten', id=k.id) }}" class="btn btn-secondary btn-sm">✏️ Edit</a>
+                                <form method="POST" action="{{ url_for('delete_konten', id=k.id) }}" class="konten-delete-form"
+                                      data-delete-title="{{ (k.campaign_project or k.judul)|e }}">
+                                    <button type="submit" class="btn btn-danger btn-sm">🗑️</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    {% if konten_list.pages > 1 %}
+    <div class="pagination">
+        {% if konten_list.has_prev %}
+            <a href="{{ url_for('dashboard', page=1) }}">« Awal</a>
+            <a href="{{ url_for('dashboard', page=konten_list.prev_num) }}">‹ Prev</a>
+        {% endif %}
+        {% for page_num in konten_list.iter_pages() %}
+            {% if page_num %}
+                {% if page_num == konten_list.page %}
+                    <span class="active">{{ page_num }}</span>
+                {% else %}
+                    <a href="{{ url_for('dashboard', page=page_num) }}">{{ page_num }}</a>
+                {% endif %}
+            {% endif %}
+        {% endfor %}
+        {% if konten_list.has_next %}
+            <a href="{{ url_for('dashboard', page=konten_list.next_num) }}">Next ›</a>
+            <a href="{{ url_for('dashboard', page=konten_list.pages) }}">Akhir »</a>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    {% else %}
+    <!-- Empty State -->
+    <div class="empty-state">
+        <div class="empty-icon">🌸</div>
+        <h3>Belum ada campaign nih!</h3>
+        <p>Mulai tambah campaign pertama kamu. Semua deadline dan report akan tersusun otomatis 💕</p>
+        <a href="{{ url_for('buat_konten') }}" class="btn btn-primary">✨ Buat Campaign Pertama</a>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}

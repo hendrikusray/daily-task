@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block title %}Tambah Campaign — Marianne Tracker{% endblock %}
+
+{% block content %}
+<div class="form-container tracker-form-container">
+    <div class="form-heading">
+        <span class="eyebrow">✨ Campaign Baru</span>
+        <h2>Tambah Campaign</h2>
+    </div>
+
+    <form method="POST" class="tracker-form">
+        <div class="form-grid">
+
+            <!-- CATEGORY — custom picker -->
+            <div class="form-group-full">
+                <label>Category 🏷️</label>
+                <div class="category-wrapper">
+                    <select id="category_preset" onchange="handleCategorySelect(this)">
+                        <option value="">— Pilih category —</option>
+                        {% for option in category_options %}
+                            <option value="{{ option }}">{{ option }}</option>
+                        {% endfor %}
+                        <option value="__custom__">✍️ Tulis nama sendiri...</option>
+                    </select>
+                    <!-- Always submitted as 'category' -->
+                    <input type="text" id="category_value" name="category"
+                           class="category-text-input"
+                           placeholder="Ketik nama category kamu..."
+                           style="display:none">
+                </div>
+            </div>
+
+            <div class="form-group-full">
+                <label for="brand">Brand 💼</label>
+                <input type="text" id="brand" name="brand" placeholder="Nama brand" required>
+            </div>
+
+            <div class="form-group-full wide-field">
+                <label for="campaign_project">Campaign / Project 🎯</label>
+                <input type="text" id="campaign_project" name="campaign_project" placeholder="Nama campaign atau project" required>
+            </div>
+
+            <div class="form-group-full">
+                <label for="payment">Payment 💳</label>
+                <select id="payment" name="payment" required>
+                    <option value="">— Pilih payment —</option>
+                    {% for option in payment_options %}
+                        <option value="{{ option }}">{{ option }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group-full">
+                <label for="fee">Fee 💰</label>
+                <input type="text" id="fee" name="fee" placeholder="Rp ...">
+            </div>
+
+            <div class="form-group-full">
+                <label for="platform">Platform 📱</label>
+                <select id="platform" name="platform" required>
+                    <option value="">— Pilih platform —</option>
+                    {% for option in platform_options %}
+                        <option value="{{ option }}">{{ option }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group-full">
+                <label for="status">Status 🔖</label>
+                <select id="status" name="status" required>
+                    <option value="">— Pilih status —</option>
+                    {% for option in status_options %}
+                        <option value="{{ option }}">{{ option }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group-full">
+                <label for="deadline">Deadline 📅</label>
+                <input type="text" id="deadline" name="deadline"
+                       class="datepicker"
+                       placeholder="Pilih tanggal deadline..." required>
+            </div>
+
+            <div class="form-group-full wide-field">
+                <label for="sow">SOW (Scope of Work) 📝</label>
+                <input type="text" id="sow" name="sow" placeholder="Deskripsi pekerjaan...">
+            </div>
+
+            <div class="form-group-full wide-field">
+                <label for="product_knowledge">Product Knowledge 🛍️</label>
+                <textarea id="product_knowledge" name="product_knowledge"
+                          placeholder="Brief produk atau info penting..."></textarea>
+            </div>
+
+            <div class="form-group-full wide-field">
+                <label for="link_content">Link Content 🔗</label>
+                <input type="url" id="link_content" name="link_content" placeholder="https://...">
+            </div>
+
+            <div class="form-group-full wide-field">
+                <label for="note">Note 💬</label>
+                <textarea id="note" name="note" placeholder="Catatan tambahan..."></textarea>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-success">💾 Simpan Campaign</button>
+            <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">Batal</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

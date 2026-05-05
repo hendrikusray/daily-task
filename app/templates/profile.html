@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}Profil — Marianne Tracker{% endblock %}
+
+{% block content %}
+{% set display_name = user.username|replace('.', ' ')|title %}
+<div class="profile-container">
+    <div class="profile-header">
+        <div class="profile-avatar-ring">{{ user.username[0].upper() }}</div>
+        <span class="eyebrow">✨ Profil Creator</span>
+        <h2>{{ display_name }}</h2>
+        <p>{{ user.email }}</p>
+    </div>
+
+    <div class="profile-info">
+        <div class="profile-info-row">
+            <span class="profile-info-label">👤 Username</span>
+            <span class="profile-info-value">{{ user.username }}</span>
+        </div>
+        <div class="profile-info-row">
+            <span class="profile-info-label">📧 Email</span>
+            <span class="profile-info-value">{{ user.email }}</span>
+        </div>
+        <div class="profile-info-row">
+            <span class="profile-info-label">🗓️ Member Sejak</span>
+            <span class="profile-info-value">{{ user.created_at.strftime('%d %B %Y') }}</span>
+        </div>
+        <div class="profile-info-row">
+            <span class="profile-info-label">📋 Total Campaign</span>
+            <span class="profile-info-value">{{ user.konten|length }} campaign</span>
+        </div>
+    </div>
+
+    <div class="profile-actions">
+        <a href="{{ url_for('dashboard') }}" class="btn btn-primary">🌸 Kembali ke Dashboard</a>
+    </div>
+</div>
+{% endblock %}
