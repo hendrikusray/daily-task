@@ -44,6 +44,49 @@ function initCategoryField(currentValue, presetValues) {
     }
 }
 
+// === GOOGLE DRIVE UPLOAD ===
+function uploadToDrive(input) {
+    const file = input.files[0];
+    if (!file) return;
+
+    const linkInput = document.getElementById('link_content');
+    const statusEl = document.getElementById('driveUploadStatus');
+    const uploadBtn = document.getElementById('driveUploadBtn');
+
+    function setStatus(cls, msg) {
+        statusEl.className = 'drive-status ' + cls;
+        statusEl.textContent = msg;
+        statusEl.style.display = 'block';
+    }
+
+    setStatus('uploading', '⏳ Mengupload "' + file.name + '" ke Google Drive...');
+    if (uploadBtn) { uploadBtn.disabled = true; uploadBtn.textContent = 'Mengupload...'; }
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    fetch('/drive/upload', { method: 'POST', body: formData })
+        .then(function (res) { return res.json(); })
+        .then(function (data) {
+            if (data.error) {
+                setStatus('error', '❌ ' + data.error);
+            } else {
+                if (linkInput) linkInput.value = data.link;
+                setStatus('success', '✅ Upload berhasil! Link sudah diisi otomatis.');
+            }
+        })
+        .catch(function () {
+            setStatus('error', '❌ Terjadi kesalahan jaringan. Coba lagi.');
+        })
+        .finally(function () {
+            if (uploadBtn) {
+                uploadBtn.disabled = false;
+                uploadBtn.innerHTML = '<svg class="drive-icon" viewBox="0 0 87.3 78" xmlns="http://www.w3.org/2000/svg"><path d="M6.6 66.85l3.85 6.65c.8 1.4 1.95 2.5 3.3 3.3L28 55.65H0c0 1.55.4 3.1 1.2 4.5z" fill="#0066DA"/><path d="M43.65 25L29.35 0c-1.35.8-2.5 1.9-3.3 3.3L1.2 46.4C.4 47.8 0 49.35 0 50.9h28z" fill="#00AC47"/><path d="M73.55 76.8c1.35-.8 2.5-1.9 3.3-3.3L77.7 72l14.5-25.1c.8-1.4 1.2-2.95 1.2-4.5H65.3L73.55 76.8z" fill="#EA4335"/><path d="M43.65 25L57.95 0H29.35z" fill="#00832D"/><path d="M86.1 50.9H65.3L43.65 25 28 50.9z" fill="#2684FC"/><path d="M43.65 25l-15.65 25.9-15.4 15.15c.8.8 1.75 1.45 2.85 1.8l28.2-42.85z" fill="#FFBA00"/></svg> Upload ke Drive';
+            }
+            input.value = '';
+        });
+}
+
 // === INIT ON DOM READY ===
 document.addEventListener('DOMContentLoaded', function () {
     const deleteModal = document.getElementById('deleteModal');

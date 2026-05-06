@@ -45,6 +45,10 @@ instance/
 .env.local
 .env.*.local
 
+# Google OAuth credentials (jangan di-commit!)
+google_credentials.json
+app/google_credentials.json
+
 # Logs
 *.log
 logs/

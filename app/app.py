@@ -1,4 +1,6 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
+import os
+import uuid
+from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -6,9 +8,34 @@ from datetime import date, datetime, timedelta
 from sqlalchemy import inspect, text
 
 app = Flask(__name__, template_folder='templates', static_folder='static')
-app.config['SECRET_KEY'] = 'your-secret-key-change-this-in-production'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///konten.db'
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'your-secret-key-change-this-in-production')
+
+_db_url = os.environ.get('DATABASE_URL', 'sqlite:///konten.db')
+if _db_url.startswith('postgres://'):
+    _db_url = _db_url.replace('postgres://', 'postgresql://', 1)
+app.config['SQLALCHEMY_DATABASE_URI'] = _db_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# ---- Google OAuth / Drive ----
+GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID', '')
+GOOGLE_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET', '')
+_CREDS_FILE = os.path.join(os.path.dirname(__file__), 'google_credentials.json')
+if not GOOGLE_CLIENT_ID and os.path.exists(_CREDS_FILE):
+    import json as _json
+    with open(_CREDS_FILE) as _f:
+        _creds_data = _json.load(_f).get('web', {})
+    GOOGLE_CLIENT_ID = _creds_data.get('client_id', '')
+    GOOGLE_CLIENT_SECRET = _creds_data.get('client_secret', '')
+
+GOOGLE_SCOPES = [
+    'openid',
+    'https://www.googleapis.com/auth/userinfo.email',
+    'https://www.googleapis.com/auth/userinfo.profile',
+    'https://www.googleapis.com/auth/drive.file',
+]
+# Allow OAuth over HTTP in local dev (set PRODUCTION=1 in env to disable)
+if not os.environ.get('PRODUCTION'):
+    os.environ.setdefault('OAUTHLIB_INSECURE_TRANSPORT', '1')
 
 db = SQLAlchemy(app)
 login_manager = LoginManager()
@@ -35,6 +62,11 @@ class User(UserMixin, db.Model):
     password = db.Column(db.String(200), nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    google_id = db.Column(db.String(100), nullable=True)
+    google_email = db.Column(db.String(200), nullable=True)
+    google_access_token = db.Column(db.Text, nullable=True)
+    google_refresh_token = db.Column(db.Text, nullable=True)
+    google_token_expiry = db.Column(db.DateTime, nullable=True)
     konten = db.relationship('Konten', backref='author', lazy=True, cascade='all, delete-orphan')
 
     def set_password(self, password):
@@ -220,6 +252,68 @@ def ensure_tracker_columns():
     db.session.commit()
 
 
+def ensure_user_columns():
+    inspector = inspect(db.engine)
+    if not inspector.has_table('user'):
+        return
+    existing = {col['name'] for col in inspector.get_columns('user')}
+    migrations = {
+        'google_id': 'ALTER TABLE user ADD COLUMN google_id VARCHAR(100)',
+        'google_email': 'ALTER TABLE user ADD COLUMN google_email VARCHAR(200)',
+        'google_access_token': 'ALTER TABLE user ADD COLUMN google_access_token TEXT',
+        'google_refresh_token': 'ALTER TABLE user ADD COLUMN google_refresh_token TEXT',
+        'google_token_expiry': 'ALTER TABLE user ADD COLUMN google_token_expiry DATETIME',
+    }
+    for col, sql in migrations.items():
+        if col not in existing:
+            db.session.execute(text(sql))
+    db.session.commit()
+
+
+def get_google_flow():
+    from google_auth_oauthlib.flow import Flow
+    redirect_uri = url_for('google_callback', _external=True)
+    if os.path.exists(_CREDS_FILE):
+        return Flow.from_client_secrets_file(
+            _CREDS_FILE,
+            scopes=GOOGLE_SCOPES,
+            redirect_uri=redirect_uri,
+        )
+    return Flow.from_client_config(
+        {"web": {
+            "client_id": GOOGLE_CLIENT_ID,
+            "client_secret": GOOGLE_CLIENT_SECRET,
+            "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+            "token_uri": "https://oauth2.googleapis.com/token",
+            "redirect_uris": [redirect_uri],
+        }},
+        scopes=GOOGLE_SCOPES,
+        redirect_uri=redirect_uri,
+    )
+
+
+def get_drive_service(user):
+    from google.oauth2.credentials import Credentials
+    from google.auth.transport.requests import Request as GoogleRequest
+    from googleapiclient.discovery import build
+
+    creds = Credentials(
+        token=user.google_access_token,
+        refresh_token=user.google_refresh_token,
+        token_uri='https://oauth2.googleapis.com/token',
+        client_id=GOOGLE_CLIENT_ID,
+        client_secret=GOOGLE_CLIENT_SECRET,
+        scopes=GOOGLE_SCOPES,
+    )
+    if creds.expired and creds.refresh_token:
+        creds.refresh(GoogleRequest())
+        user.google_access_token = creds.token
+        if creds.expiry:
+            user.google_token_expiry = creds.expiry
+        db.session.commit()
+    return build('drive', 'v3', credentials=creds)
+
+
 # ============ ROUTES ============
 @app.route('/')
 def index():
@@ -285,7 +379,7 @@ def login():
         else:
             flash('Username atau password salah!', 'danger')
 
-    return render_template('login.html')
+    return render_template('login.html', google_configured=bool(GOOGLE_CLIENT_ID))
 
 
 @app.route('/dashboard')
@@ -423,29 +517,164 @@ def logout():
     return redirect(url_for('login'))
 
 
+@app.route('/auth/google')
+def google_login():
+    if not GOOGLE_CLIENT_ID:
+        flash('Google login belum dikonfigurasi oleh admin.', 'danger')
+        return redirect(url_for('login'))
+    flow = get_google_flow()
+    authorization_url, state = flow.authorization_url(
+        access_type='offline',
+        prompt='consent',
+        include_granted_scopes='true',
+    )
+    session['google_oauth_state'] = state
+    return redirect(authorization_url)
+
+
+@app.route('/auth/google/callback')
+def google_callback():
+    if not GOOGLE_CLIENT_ID:
+        return redirect(url_for('login'))
+
+    if request.args.get('error'):
+        flash('Login Google dibatalkan.', 'warning')
+        return redirect(url_for('login'))
+
+    if request.args.get('state') != session.pop('google_oauth_state', None):
+        flash('Terjadi masalah saat login Google. Coba lagi.', 'danger')
+        return redirect(url_for('login'))
+
+    try:
+        flow = get_google_flow()
+        flow.fetch_token(authorization_response=request.url)
+        credentials = flow.credentials
+
+        from googleapiclient.discovery import build
+        info_service = build('oauth2', 'v2', credentials=credentials)
+        user_info = info_service.userinfo().get().execute()
+
+        google_id = user_info.get('id')
+        google_email = user_info.get('email', '')
+        google_name = user_info.get('name', '')
+
+        # Find existing user by google_id, then by email
+        user = User.query.filter_by(google_id=google_id).first()
+        if not user:
+            user = User.query.filter_by(email=google_email).first()
+        if not user:
+            base = google_email.split('@')[0].replace('.', '_').replace('-', '_')
+            username = base
+            counter = 1
+            while User.query.filter_by(username=username).first():
+                username = f'{base}_{counter}'
+                counter += 1
+            user = User(username=username, email=google_email,
+                        password=generate_password_hash(str(uuid.uuid4())))
+            db.session.add(user)
+
+        user.google_id = google_id
+        user.google_email = google_email
+        user.google_access_token = credentials.token
+        if credentials.refresh_token:
+            user.google_refresh_token = credentials.refresh_token
+        if credentials.expiry:
+            user.google_token_expiry = credentials.expiry
+        db.session.commit()
+
+        login_user(user)
+        flash(f'Selamat datang, {user.username}! 🌸', 'success')
+        return redirect(url_for('dashboard'))
+
+    except Exception as e:
+        flash('Login Google gagal. Silakan coba lagi.', 'danger')
+        return redirect(url_for('login'))
+
+
+@app.route('/drive/upload', methods=['POST'])
+@login_required
+def drive_upload():
+    if not current_user.google_access_token:
+        return jsonify({'error': 'Kamu belum login dengan Google. Silakan logout lalu login ulang menggunakan akun Google.'}), 403
+
+    if 'file' not in request.files:
+        return jsonify({'error': 'Tidak ada file yang dikirim.'}), 400
+
+    file = request.files['file']
+    if not file or file.filename == '':
+        return jsonify({'error': 'File kosong.'}), 400
+
+    try:
+        import io
+        from googleapiclient.http import MediaIoBaseUpload
+
+        drive_service = get_drive_service(current_user)
+
+        # Find or create "project-campaign" folder
+        folder_name = 'project-campaign'
+        res = drive_service.files().list(
+            q=f"name='{folder_name}' and mimeType='application/vnd.google-apps.folder' and trashed=false",
+            fields='files(id)',
+            pageSize=1,
+        ).execute()
+        folders = res.get('files', [])
+        if folders:
+            folder_id = folders[0]['id']
+        else:
+            folder = drive_service.files().create(
+                body={'name': folder_name, 'mimeType': 'application/vnd.google-apps.folder'},
+                fields='id',
+            ).execute()
+            folder_id = folder['id']
+
+        # Upload file into the folder
+        content = file.read()
+        mimetype = file.content_type or 'application/octet-stream'
+        media = MediaIoBaseUpload(io.BytesIO(content), mimetype=mimetype, resumable=True)
+        uploaded = drive_service.files().create(
+            body={'name': file.filename, 'parents': [folder_id]},
+            media_body=media,
+            fields='id',
+        ).execute()
+
+        file_id = uploaded['id']
+        drive_service.permissions().create(
+            fileId=file_id,
+            body={'type': 'anyone', 'role': 'reader'},
+        ).execute()
+
+        link = f'https://drive.google.com/file/d/{file_id}/view?usp=sharing'
+        return jsonify({'link': link, 'filename': file.filename})
+
+    except Exception as e:
+        return jsonify({'error': f'Upload gagal: {str(e)}'}), 500
+
+
 @app.route('/profile')
 @login_required
 def profile():
     return render_template('profile.html', user=current_user)
 
 
+def init_db():
+    db.create_all()
+    ensure_tracker_columns()
+    ensure_user_columns()
+    default_user = User.query.filter_by(username='marianne.hanna').first()
+    if not default_user:
+        default_user = User(
+            username='marianne.hanna',
+            email='marianne.hanna@email.com'
+        )
+        default_user.set_password('TuhanMemberkati31!')
+        db.session.add(default_user)
+        db.session.commit()
+        print("✅ Default account created: marianne.hanna")
+
+
+with app.app_context():
+    init_db()
+
+
 if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()
-        ensure_tracker_columns()
-        
-        # Create default account if not exists
-        default_user = User.query.filter_by(username='marianne.hanna').first()
-        if not default_user:
-            default_user = User(
-                username='marianne.hanna',
-                email='marianne.hanna@email.com'
-            )
-            default_user.set_password('TuhanMemberkati31!')
-            db.session.add(default_user)
-            db.session.commit()
-            print("✅ Default account created:")
-            print("   Username: marianne.hanna")
-            print("   Password: TuhanMemberkati31!")
-    
     app.run(debug=True, host='0.0.0.0', port=5000)
