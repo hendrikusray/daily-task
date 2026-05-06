@@ -16,7 +16,7 @@ ENV PYTHONUNBUFFERED=1
 ENV PRODUCTION=1
 
 # Expose port
-EXPOSE 5000
+EXPOSE 7860
 
 # Run with gunicorn
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "2", "--chdir", "app", "app:app"]
+CMD ["gunicorn", "--bind", "0.0.0.0:7860", "--workers", "2", "--chdir", "app", "app:app"]
