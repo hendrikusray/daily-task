@@ -1,3 +1,25 @@
+// === PAGE LOADER ===
+;(function () {
+    var loader = document.getElementById('pageLoader');
+    if (!loader) return;
+    var t0 = Date.now();
+    var MIN_MS = 3000;
+
+    function hideLoader() {
+        var wait = Math.max(0, MIN_MS - (Date.now() - t0));
+        setTimeout(function () {
+            loader.classList.add('loader-out');
+            setTimeout(function () { loader.style.display = 'none'; }, 750);
+        }, wait);
+    }
+
+    if (document.readyState === 'complete') {
+        hideLoader();
+    } else {
+        window.addEventListener('load', hideLoader);
+    }
+}());
+
 // === PASSWORD TOGGLE ===
 function togglePasswordVisibility(inputId) {
     const input = document.getElementById(inputId);
@@ -255,25 +277,84 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    // === THEME PICKER ===
+    var themeSheet = document.getElementById('mobileThemeSheet');
+    var themeIcons = {
+        lily: '🌸',
+        polka: '●',
+        garden: '🌿',
+        floral: '✿'
+    };
+
+    function syncThemeControls(theme) {
+        document.querySelectorAll('.theme-dot[data-theme-btn]').forEach(function (btn) {
+            var isActive = btn.dataset.themeBtn === theme;
+            btn.classList.toggle('active', isActive);
+            btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+        });
+
+        document.querySelectorAll('.theme-choice[data-theme-choice]').forEach(function (choice) {
+            var isActive = choice.dataset.themeChoice === theme;
+            choice.classList.toggle('active', isActive);
+            choice.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+        });
+
+        document.querySelectorAll('[data-current-theme-icon]').forEach(function (icon) {
+            icon.textContent = themeIcons[theme] || themeIcons.lily;
+        });
+    }
+
+    function setTheme(theme) {
+        document.body.dataset.theme = theme;
+        try { localStorage.setItem('marianne-theme', theme); } catch (e) {}
+        syncThemeControls(theme);
+    }
+
+    function openThemeSheet() {
+        if (!themeSheet) return;
+        themeSheet.hidden = false;
+        document.body.classList.add('modal-open');
+
+        var activeChoice = themeSheet.querySelector('.theme-choice.active') ||
+            themeSheet.querySelector('.theme-choice');
+        if (activeChoice) activeChoice.focus();
+    }
+
+    function closeThemeSheet() {
+        if (!themeSheet) return;
+        themeSheet.hidden = true;
+        document.body.classList.remove('modal-open');
+    }
+
+    syncThemeControls(document.body.dataset.theme || 'lily');
+
+    document.querySelectorAll('.theme-dot[data-theme-btn]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            setTheme(btn.dataset.themeBtn);
+        });
+    });
+
+    document.querySelectorAll('.theme-choice[data-theme-choice]').forEach(function (choice) {
+        choice.addEventListener('click', function () {
+            setTheme(choice.dataset.themeChoice);
+            closeThemeSheet();
+        });
+    });
+
+    document.querySelectorAll('[data-theme-open]').forEach(function (button) {
+        button.addEventListener('click', openThemeSheet);
+    });
+
+    document.querySelectorAll('[data-theme-close]').forEach(function (button) {
+        button.addEventListener('click', closeThemeSheet);
+    });
+
     document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape') {
             if (deleteModal && !deleteModal.hidden) closeDeleteModal();
             var detailModal = document.getElementById('campaignDetailModal');
             if (detailModal && !detailModal.hidden) closeCampaignDetail();
+            if (themeSheet && !themeSheet.hidden) closeThemeSheet();
         }
-    });
-
-    // === THEME PICKER ===
-    var currentTheme = document.body.dataset.theme || 'lily';
-    document.querySelectorAll('.theme-dot[data-theme-btn]').forEach(function (btn) {
-        if (btn.dataset.themeBtn === currentTheme) btn.classList.add('active');
-        btn.addEventListener('click', function () {
-            var theme = btn.dataset.themeBtn;
-            document.body.dataset.theme = theme;
-            try { localStorage.setItem('marianne-theme', theme); } catch (e) {}
-            document.querySelectorAll('.theme-dot[data-theme-btn]').forEach(function (b) {
-                b.classList.toggle('active', b.dataset.themeBtn === theme);
-            });
-        });
     });
 });

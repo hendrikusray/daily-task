@@ -13,6 +13,27 @@
 <body class="{% if current_user.is_authenticated %}app-page{% else %}auth-page{% endif %}" data-theme="lily">
 <script>try{var _t=localStorage.getItem('marianne-theme');if(_t)document.body.dataset.theme=_t;}catch(e){}</script>
 
+<div id="pageLoader" class="page-loader" aria-hidden="true">
+    <div class="loader-inner">
+        <div class="loader-mark">
+            <svg class="loader-lily-svg" viewBox="0 0 52 52" xmlns="http://www.w3.org/2000/svg">
+                <ellipse cx="26" cy="9"  rx="6.5" ry="13" transform="rotate(0   26 26)"/>
+                <ellipse cx="26" cy="9"  rx="5.5" ry="11" transform="rotate(60  26 26)"/>
+                <ellipse cx="26" cy="9"  rx="6.5" ry="13" transform="rotate(120 26 26)"/>
+                <ellipse cx="26" cy="9"  rx="5.5" ry="11" transform="rotate(180 26 26)"/>
+                <ellipse cx="26" cy="9"  rx="6.5" ry="13" transform="rotate(240 26 26)"/>
+                <ellipse cx="26" cy="9"  rx="5.5" ry="11" transform="rotate(300 26 26)"/>
+                <circle class="loader-stamen-outer" cx="26" cy="26" r="7.5"/>
+                <circle class="loader-stamen-inner" cx="26" cy="26" r="3.8"/>
+            </svg>
+        </div>
+        <p class="loader-name">Marianne</p>
+        <div class="loader-dots">
+            <span></span><span></span><span></span>
+        </div>
+    </div>
+</div>
+
 {% if current_user.is_authenticated %}
 <div class="app-shell">
     <aside class="sidebar">
@@ -61,10 +82,10 @@
         <div class="theme-picker-wrap">
             <span class="theme-picker-label">Tema</span>
             <div class="theme-picker">
-                <button class="theme-dot theme-dot-lily"   data-theme-btn="lily"   title="Lily (Default)"></button>
-                <button class="theme-dot theme-dot-polka"  data-theme-btn="polka"  title="Polka Dots"></button>
-                <button class="theme-dot theme-dot-garden" data-theme-btn="garden" title="Garden"></button>
-                <button class="theme-dot theme-dot-floral" data-theme-btn="floral" title="Floral"></button>
+                <button class="theme-dot theme-dot-lily"   data-theme-btn="lily"   title="Lily (Default)" aria-label="Pakai tema Lily"></button>
+                <button class="theme-dot theme-dot-polka"  data-theme-btn="polka"  title="Polka Dots" aria-label="Pakai tema Polka Dots"></button>
+                <button class="theme-dot theme-dot-garden" data-theme-btn="garden" title="Garden" aria-label="Pakai tema Garden"></button>
+                <button class="theme-dot theme-dot-floral" data-theme-btn="floral" title="Floral" aria-label="Pakai tema Floral"></button>
             </div>
         </div>
 
@@ -72,6 +93,10 @@
 
     <main class="app-main">
         <div class="top-actions">
+            <button type="button" class="mobile-theme-trigger" data-theme-open aria-haspopup="dialog" aria-controls="mobileThemeSheet">
+                <span class="theme-trigger-icon" data-current-theme-icon>🌸</span>
+                <span>Tema</span>
+            </button>
             <a href="{{ url_for('logout') }}" class="logout-link">Logout 👋</a>
         </div>
 {% endif %}
@@ -107,6 +132,38 @@
         <div class="delete-dialog-actions">
             <button type="button" class="btn btn-secondary" data-modal-close>Batal</button>
             <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Ya, hapus</button>
+        </div>
+    </section>
+</div>
+
+<div class="mobile-theme-sheet" id="mobileThemeSheet" hidden>
+    <div class="mobile-theme-backdrop" data-theme-close></div>
+    <section class="mobile-theme-panel" role="dialog" aria-modal="true" aria-labelledby="mobileThemeTitle">
+        <div class="mobile-sheet-handle" aria-hidden="true"></div>
+        <div class="mobile-theme-header">
+            <div>
+                <span class="eyebrow">Tema</span>
+                <h2 id="mobileThemeTitle">Pilih tampilan</h2>
+            </div>
+            <button type="button" class="detail-close-btn" data-theme-close aria-label="Tutup pilihan tema">✕</button>
+        </div>
+        <div class="mobile-theme-options">
+            <button type="button" class="theme-choice" data-theme-choice="lily">
+                <span class="theme-dot theme-dot-lily" aria-hidden="true"></span>
+                <span><strong>Lily</strong><small>Ivory, pink, gold</small></span>
+            </button>
+            <button type="button" class="theme-choice" data-theme-choice="polka">
+                <span class="theme-dot theme-dot-polka" aria-hidden="true"></span>
+                <span><strong>Polka</strong><small>Olive dan blush dots</small></span>
+            </button>
+            <button type="button" class="theme-choice" data-theme-choice="garden">
+                <span class="theme-dot theme-dot-garden" aria-hidden="true"></span>
+                <span><strong>Garden</strong><small>Watercolor lembut</small></span>
+            </button>
+            <button type="button" class="theme-choice" data-theme-choice="floral">
+                <span class="theme-dot theme-dot-floral" aria-hidden="true"></span>
+                <span><strong>Floral</strong><small>Bunga colorful</small></span>
+            </button>
         </div>
     </section>
 </div>
