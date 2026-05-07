@@ -12,23 +12,20 @@
     <form method="POST" class="tracker-form">
         <div class="form-grid">
 
-            <!-- CATEGORY — custom picker -->
+            <!-- CATEGORY -->
             <div class="form-group-full">
                 <label>Category 🏷️</label>
-                <div class="category-wrapper">
-                    <select id="category_preset" onchange="handleCategorySelect(this)">
-                        <option value="">— Pilih category —</option>
-                        {% for option in category_options %}
-                            <option value="{{ option }}">{{ option }}</option>
-                        {% endfor %}
-                        <option value="__custom__">✍️ Tulis nama sendiri...</option>
-                    </select>
-                    <!-- Always submitted as 'category' -->
-                    <input type="text" id="category_value" name="category"
-                           class="category-text-input"
-                           placeholder="Ketik nama category kamu..."
-                           style="display:none">
-                </div>
+                <select id="category_preset" onchange="handleCategorySelect(this)">
+                    <option value="">— Pilih category —</option>
+                    {% for option in category_options %}
+                        <option value="{{ option }}">{{ option }}</option>
+                    {% endfor %}
+                    <option value="__custom__">+ Tambah sendiri</option>
+                </select>
+                <input type="text" id="category_value" name="category"
+                       class="category-custom-input"
+                       placeholder="Ketik nama category..."
+                       style="display:none">
             </div>
 
             <div class="form-group-full">
@@ -91,7 +88,23 @@
             <div class="form-group-full wide-field">
                 <label for="product_knowledge">Product Knowledge 🛍️</label>
                 <textarea id="product_knowledge" name="product_knowledge"
-                          placeholder="Brief produk atau info penting..."></textarea>
+                          placeholder="Deskripsi produk, brief, atau info penting..."></textarea>
+                <div class="link-content-row" style="margin-top:8px">
+                    <input type="url" id="product_knowledge_link" name="product_knowledge_link"
+                           placeholder="Link / URL dokumen...">
+                    {% if current_user.google_access_token %}
+                    <button type="button" class="btn btn-drive" onclick="document.getElementById('pkFileInput').click()">
+                        <svg class="drive-icon" viewBox="0 0 87.3 78" xmlns="http://www.w3.org/2000/svg"><path d="M6.6 66.85l3.85 6.65c.8 1.4 1.95 2.5 3.3 3.3L28 55.65H0c0 1.55.4 3.1 1.2 4.5z" fill="#0066DA"/><path d="M43.65 25L29.35 0c-1.35.8-2.5 1.9-3.3 3.3L1.2 46.4C.4 47.8 0 49.35 0 50.9h28z" fill="#00AC47"/><path d="M73.55 76.8c1.35-.8 2.5-1.9 3.3-3.3L77.7 72l14.5-25.1c.8-1.4 1.2-2.95 1.2-4.5H65.3L73.55 76.8z" fill="#EA4335"/><path d="M43.65 25L57.95 0H29.35z" fill="#00832D"/><path d="M86.1 50.9H65.3L43.65 25 28 50.9z" fill="#2684FC"/><path d="M43.65 25l-15.65 25.9-15.4 15.15c.8.8 1.75 1.45 2.85 1.8l28.2-42.85z" fill="#FFBA00"/></svg>
+                        Upload PDF
+                    </button>
+                    <input type="file" id="pkFileInput" accept=".pdf,.doc,.docx" style="display:none"
+                           onchange="uploadPKToDrive(this)">
+                    {% endif %}
+                </div>
+                <div id="pkUploadStatus" class="drive-status" style="display:none"></div>
+                {% if not current_user.google_access_token %}
+                <p class="drive-hint">💡 <a href="{{ url_for('google_login') }}">Login dengan Google</a> untuk upload langsung ke Google Drive</p>
+                {% endif %}
             </div>
 
             <div class="form-group-full wide-field">
@@ -113,9 +126,6 @@
                     <input type="file" id="driveFileInput" style="display:none" onchange="uploadToDrive(this)">
                     {% endif %}
                 </div>
-                {% if not current_user.google_access_token %}
-                <p class="drive-hint">💡 <a href="{{ url_for('google_login') }}">Login dengan Google</a> untuk upload langsung ke Google Drive</p>
-                {% endif %}
                 <div id="driveUploadStatus" class="drive-status" style="display:none"></div>
             </div>
 

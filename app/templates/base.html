@@ -10,7 +10,8 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
-<body class="{% if current_user.is_authenticated %}app-page{% else %}auth-page{% endif %}">
+<body class="{% if current_user.is_authenticated %}app-page{% else %}auth-page{% endif %}" data-theme="lily">
+<script>try{var _t=localStorage.getItem('marianne-theme');if(_t)document.body.dataset.theme=_t;}catch(e){}</script>
 
 {% if current_user.is_authenticated %}
 <div class="app-shell">
@@ -56,6 +57,16 @@
                 </a>
             </li>
         </ul>
+
+        <div class="theme-picker-wrap">
+            <span class="theme-picker-label">Tema</span>
+            <div class="theme-picker">
+                <button class="theme-dot theme-dot-lily"   data-theme-btn="lily"   title="Lily (Default)"></button>
+                <button class="theme-dot theme-dot-polka"  data-theme-btn="polka"  title="Polka Dots"></button>
+                <button class="theme-dot theme-dot-garden" data-theme-btn="garden" title="Garden"></button>
+                <button class="theme-dot theme-dot-floral" data-theme-btn="floral" title="Floral"></button>
+            </div>
+        </div>
 
     </aside>
 

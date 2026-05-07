@@ -48,7 +48,10 @@ login_manager.login_view = 'login'
 
 CATEGORY_OPTIONS = ['Lifestyle', 'Beauty', 'F&B', 'Fashion', 'Health', 'Travel', 'Home Living']
 PAYMENT_OPTIONS = ['Paid', 'Unpaid']
-PLATFORM_OPTIONS = ['Reels', 'Instagram', 'TikTok', 'YouTube', 'Shopee', 'Blog', 'Story']
+PLATFORM_OPTIONS = [
+    'IG Story', 'IG Feeds', 'IG Reels', 'Threads',
+    'TikTok Naughtysensei', 'TikTok mariannehanna',
+]
 STATUS_OPTIONS = [
     'On progress',
     'On approval',
@@ -95,6 +98,7 @@ class Konten(db.Model):
     status = db.Column(db.String(80), nullable=True)
     deadline = db.Column(db.Date, nullable=True)
     product_knowledge = db.Column(db.Text, nullable=True)
+    product_knowledge_link = db.Column(db.String(500), nullable=True)
     link_content = db.Column(db.String(500), nullable=True)
     note = db.Column(db.Text, nullable=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
@@ -154,6 +158,7 @@ def apply_tracker_form(konten):
     konten.status = form_text('status')
     konten.deadline = parse_date(form_text('deadline'))
     konten.product_knowledge = form_text('product_knowledge')
+    konten.product_knowledge_link = form_text('product_knowledge_link')
     konten.link_content = form_text('link_content')
     konten.note = form_text('note')
 
@@ -234,6 +239,7 @@ def ensure_tracker_columns():
         'status': 'ALTER TABLE konten ADD COLUMN status VARCHAR(80)',
         'deadline': 'ALTER TABLE konten ADD COLUMN deadline DATE',
         'product_knowledge': 'ALTER TABLE konten ADD COLUMN product_knowledge TEXT',
+        'product_knowledge_link': 'ALTER TABLE konten ADD COLUMN product_knowledge_link VARCHAR(500)',
         'link_content': 'ALTER TABLE konten ADD COLUMN link_content VARCHAR(500)',
         'note': 'ALTER TABLE konten ADD COLUMN note TEXT'
     }

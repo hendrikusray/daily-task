@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200">
+
+  <!-- Large magenta flower (top-left) -->
+  <g transform="translate(48,48)">
+    <ellipse cx="0" cy="-19" rx="10" ry="17" fill="rgba(218,72,138,0.78)" transform="rotate(0)"/>
+    <ellipse cx="0" cy="-19" rx="10" ry="17" fill="rgba(218,72,138,0.72)" transform="rotate(60)"/>
+    <ellipse cx="0" cy="-19" rx="10" ry="17" fill="rgba(218,72,138,0.78)" transform="rotate(120)"/>
+    <ellipse cx="0" cy="-19" rx="10" ry="17" fill="rgba(218,72,138,0.72)" transform="rotate(180)"/>
+    <ellipse cx="0" cy="-19" rx="10" ry="17" fill="rgba(218,72,138,0.78)" transform="rotate(240)"/>
+    <ellipse cx="0" cy="-19" rx="10" ry="17" fill="rgba(218,72,138,0.72)" transform="rotate(300)"/>
+    <circle r="9"  fill="rgba(240,198,55,0.92)"/>
+    <circle r="4.5" fill="rgba(195,128,18,0.85)"/>
+    <line x1="0" y1="-9"  x2="0"  y2="-14" stroke="rgba(195,128,18,0.65)" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="8" y1="-5"  x2="12" y2="-8"  stroke="rgba(195,128,18,0.65)" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="-8" y1="-5" x2="-12" y2="-8" stroke="rgba(195,128,18,0.65)" stroke-width="1.5" stroke-linecap="round"/>
+  </g>
+
+  <!-- Teal/mint large leaf (right-top) -->
+  <path d="M118,10 C140,5 168,32 158,62 C148,92 112,84 118,10 Z" fill="rgba(68,178,148,0.68)"/>
+  <path d="M118,10 C138,35 150,52 158,62" fill="none" stroke="rgba(45,138,118,0.38)" stroke-width="1.8" stroke-linecap="round"/>
+
+  <!-- Second teal leaf (bottom-left) -->
+  <path d="M5,108 C-8,132 8,168 32,160 C56,152 46,118 5,108 Z" fill="rgba(68,178,148,0.60)"/>
+  <path d="M5,108 C16,132 26,148 32,160" fill="none" stroke="rgba(45,138,118,0.32)" stroke-width="1.5" stroke-linecap="round"/>
+
+  <!-- Orange 5-petal flower (bottom-right) -->
+  <g transform="translate(158,150)">
+    <ellipse cx="0" cy="-14" rx="8" ry="12" fill="rgba(228,112,48,0.74)" transform="rotate(0)"/>
+    <ellipse cx="0" cy="-14" rx="8" ry="12" fill="rgba(228,112,48,0.70)" transform="rotate(72)"/>
+    <ellipse cx="0" cy="-14" rx="8" ry="12" fill="rgba(228,112,48,0.74)" transform="rotate(144)"/>
+    <ellipse cx="0" cy="-14" rx="8" ry="12" fill="rgba(228,112,48,0.70)" transform="rotate(216)"/>
+    <ellipse cx="0" cy="-14" rx="8" ry="12" fill="rgba(228,112,48,0.74)" transform="rotate(288)"/>
+    <circle r="6.5" fill="rgba(240,198,55,0.90)"/>
+    <circle r="3"   fill="rgba(195,128,18,0.82)"/>
+  </g>
+
+  <!-- Lavender leaf (right-middle) -->
+  <path d="M172,106 C188,90 202,118 194,136 C186,154 166,144 172,106 Z" fill="rgba(182,148,212,0.60)"/>
+  <path d="M172,106 C180,118 186,130 194,136" fill="none" stroke="rgba(148,112,178,0.30)" stroke-width="1.2" stroke-linecap="round"/>
+
+  <!-- Yellow small flower (top-right) -->
+  <g transform="translate(180,46)">
+    <ellipse cx="0" cy="-11" rx="6" ry="10" fill="rgba(228,188,40,0.74)" transform="rotate(0)"/>
+    <ellipse cx="0" cy="-11" rx="6" ry="10" fill="rgba(228,188,40,0.70)" transform="rotate(72)"/>
+    <ellipse cx="0" cy="-11" rx="6" ry="10" fill="rgba(228,188,40,0.74)" transform="rotate(144)"/>
+    <ellipse cx="0" cy="-11" rx="6" ry="10" fill="rgba(228,188,40,0.70)" transform="rotate(216)"/>
+    <ellipse cx="0" cy="-11" rx="6" ry="10" fill="rgba(228,188,40,0.74)" transform="rotate(288)"/>
+    <circle r="5" fill="rgba(195,128,18,0.86)"/>
+  </g>
+
+  <!-- Teal oval dot cluster (center-bottom) -->
+  <ellipse cx="82"  cy="152" rx="5" ry="6.5" fill="rgba(68,178,148,0.66)"/>
+  <ellipse cx="93"  cy="160" rx="5" ry="6.5" fill="rgba(68,178,148,0.63)"/>
+  <ellipse cx="74"  cy="164" rx="4.5" ry="6" fill="rgba(68,178,148,0.60)"/>
+  <ellipse cx="86"  cy="172" rx="4.5" ry="6" fill="rgba(68,178,148,0.58)"/>
+  <ellipse cx="97"  cy="154" rx="4"  ry="5.5" fill="rgba(68,178,148,0.55)"/>
+
+  <!-- Orange oval dot cluster -->
+  <ellipse cx="126" cy="90"  rx="4.5" ry="6" fill="rgba(228,112,48,0.63)"/>
+  <ellipse cx="136" cy="97"  rx="4.5" ry="6" fill="rgba(228,112,48,0.60)"/>
+  <ellipse cx="120" cy="100" rx="4"  ry="5.5" fill="rgba(228,112,48,0.57)"/>
+  <ellipse cx="132" cy="108" rx="4"  ry="5.5" fill="rgba(228,112,48,0.54)"/>
+
+  <!-- Small lavender buds (top-right corner) -->
+  <circle cx="144" cy="22" r="4"   fill="rgba(182,148,212,0.64)"/>
+  <circle cx="152" cy="29" r="3.5" fill="rgba(182,148,212,0.60)"/>
+  <circle cx="140" cy="31" r="3.5" fill="rgba(182,148,212,0.57)"/>
+
+  <!-- Small pink buds (bottom edge) -->
+  <path d="M25,183 C19,172 30,165 35,176 C40,187 31,191 25,183 Z" fill="rgba(218,72,138,0.62)"/>
+  <path d="M38,190 C32,179 43,172 48,183 C53,194 44,198 38,190 Z" fill="rgba(218,72,138,0.57)"/>
+
+  <!-- Soft pink wash in center -->
+  <ellipse cx="70" cy="115" rx="38" ry="28" fill="rgba(218,72,138,0.05)"/>
+  <ellipse cx="138" cy="165" rx="32" ry="22" fill="rgba(68,178,148,0.05)"/>
+
+</svg>

@@ -11,37 +11,135 @@ function togglePasswordVisibility(inputId) {
     }
 }
 
-// === CATEGORY CUSTOM FIELD ===
+// === CATEGORY DROPDOWN + FREETEXT ===
 function handleCategorySelect(select) {
-    const wrapper = select.closest('.category-wrapper');
-    const textInput = wrapper.querySelector('.category-text-input');
+    var input = document.getElementById('category_value');
+    if (!input) return;
     if (select.value === '__custom__') {
-        textInput.style.display = 'block';
-        textInput.value = '';
-        textInput.focus();
+        input.style.display = 'block';
+        input.value = '';
+        input.focus();
     } else {
-        textInput.style.display = 'none';
-        textInput.value = select.value;
+        input.style.display = 'none';
+        input.value = select.value;
     }
 }
 
-// Initialize category field for edit form (called inline from template)
 function initCategoryField(currentValue, presetValues) {
-    const select = document.getElementById('category_preset');
-    const textInput = document.getElementById('category_value');
-    if (!select || !textInput) return;
-
+    var select = document.getElementById('category_preset');
+    var input = document.getElementById('category_value');
+    if (!select || !input) return;
     if (presetValues.includes(currentValue)) {
         select.value = currentValue;
-        textInput.value = currentValue;
-        textInput.style.display = 'none';
+        input.value = currentValue;
+        input.style.display = 'none';
     } else if (currentValue) {
         select.value = '__custom__';
-        textInput.value = currentValue;
-        textInput.style.display = 'block';
-    } else {
-        textInput.style.display = 'none';
+        input.value = currentValue;
+        input.style.display = 'block';
     }
+}
+
+// === PK DRIVE UPLOAD ===
+function uploadPKToDrive(inputEl) {
+    var file = inputEl.files[0];
+    if (!file) return;
+    var linkInput = document.getElementById('product_knowledge_link');
+    var statusEl = document.getElementById('pkUploadStatus');
+
+    function setStatus(cls, msg) {
+        statusEl.className = 'drive-status ' + cls;
+        statusEl.textContent = msg;
+        statusEl.style.display = 'block';
+    }
+
+    setStatus('uploading', '⏳ Mengupload "' + file.name + '" ke Google Drive...');
+    var formData = new FormData();
+    formData.append('file', file);
+
+    fetch('/drive/upload', { method: 'POST', body: formData })
+        .then(function (r) { return r.json(); })
+        .then(function (d) {
+            if (d.error) { setStatus('error', '❌ ' + d.error); }
+            else { if (linkInput) linkInput.value = d.link; setStatus('success', '✅ Upload berhasil!'); }
+        })
+        .catch(function () { setStatus('error', '❌ Gagal upload. Coba lagi.'); })
+        .finally(function () { inputEl.value = ''; });
+}
+
+// === CAMPAIGN DETAIL PANEL ===
+function openCampaignDetail(row) {
+    var modal = document.getElementById('campaignDetailModal');
+    if (!modal) return;
+
+    document.getElementById('detailCategory').textContent = row.dataset.category || '';
+    document.getElementById('detailCampaign').textContent = row.dataset.campaign || '-';
+    document.getElementById('detailBrand').textContent = row.dataset.brand || '';
+    document.getElementById('detailEditBtn').href = row.dataset.editUrl || '#';
+
+    var statusClass = (row.dataset.status || 'none').toLowerCase().replace(/ /g, '-').replace(/'/g, '');
+    var body = document.getElementById('detailBody');
+    body.innerHTML = '';
+
+    // Quick stats row: Platform, Status, Deadline, Payment, Fee
+    var stats = [
+        { label: 'Platform',  value: row.dataset.platform },
+        { label: 'Status',    value: row.dataset.status,   isStatus: true },
+        { label: 'Deadline',  value: row.dataset.deadline, isDeadline: true },
+        { label: 'Payment',   value: row.dataset.payment },
+        { label: 'Fee',       value: row.dataset.fee },
+    ];
+    var hasStats = stats.some(function(s) { return !!s.value; });
+    if (hasStats) {
+        var grid = document.createElement('div');
+        grid.className = 'detail-stats-grid';
+        stats.forEach(function(s) {
+            if (!s.value) return;
+            var cell = document.createElement('div');
+            cell.className = 'detail-stat';
+            var val;
+            if (s.isStatus) {
+                val = '<span class="status-badge status-' + statusClass + '">' + s.value + '</span>';
+            } else if (s.isDeadline) {
+                var tag = '';
+                if (row.dataset.deadlineState === 'due-soon') tag = ' <span class="deadline-soon-tag">H-5</span>';
+                if (row.dataset.deadlineState === 'overdue')  tag = ' <span class="deadline-overdue-tag">Overdue</span>';
+                val = '<span class="detail-stat-value">' + s.value + tag + '</span>';
+            } else {
+                val = '<span class="detail-stat-value">' + s.value + '</span>';
+            }
+            cell.innerHTML = '<span class="detail-stat-label">' + s.label + '</span>' + val;
+            grid.appendChild(cell);
+        });
+        body.appendChild(grid);
+    }
+
+    // Text sections
+    var sections = [
+        { label: '📝 SOW',               value: row.dataset.sow },
+        { label: '🛍️ Product Knowledge', value: row.dataset.pk },
+        { label: '📎 PK Link / File',    value: row.dataset.pkLink, isLink: true, linkText: 'Buka File' },
+        { label: '🔗 Link Content',      value: row.dataset.link,   isLink: true, linkText: 'Buka Link Content' },
+        { label: '💬 Note',              value: row.dataset.note },
+    ];
+    sections.forEach(function(s) {
+        if (!s.value) return;
+        var sec = document.createElement('div');
+        sec.className = 'detail-section';
+        var content = s.isLink
+            ? '<a href="' + s.value + '" target="_blank" rel="noopener" class="detail-link-btn">🔗 ' + s.linkText + '</a>'
+            : '<div class="detail-section-content">' + s.value.replace(/\n/g, '<br>') + '</div>';
+        sec.innerHTML = '<div class="detail-section-label">' + s.label + '</div>' + content;
+        body.appendChild(sec);
+    });
+
+    modal.hidden = false;
+    document.body.classList.add('modal-open');
+}
+
+function closeCampaignDetail() {
+    var modal = document.getElementById('campaignDetailModal');
+    if (modal) { modal.hidden = true; document.body.classList.remove('modal-open'); }
 }
 
 // === GOOGLE DRIVE UPLOAD ===
@@ -158,8 +256,24 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     document.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape' && deleteModal && !deleteModal.hidden) {
-            closeDeleteModal();
+        if (e.key === 'Escape') {
+            if (deleteModal && !deleteModal.hidden) closeDeleteModal();
+            var detailModal = document.getElementById('campaignDetailModal');
+            if (detailModal && !detailModal.hidden) closeCampaignDetail();
         }
+    });
+
+    // === THEME PICKER ===
+    var currentTheme = document.body.dataset.theme || 'lily';
+    document.querySelectorAll('.theme-dot[data-theme-btn]').forEach(function (btn) {
+        if (btn.dataset.themeBtn === currentTheme) btn.classList.add('active');
+        btn.addEventListener('click', function () {
+            var theme = btn.dataset.themeBtn;
+            document.body.dataset.theme = theme;
+            try { localStorage.setItem('marianne-theme', theme); } catch (e) {}
+            document.querySelectorAll('.theme-dot[data-theme-btn]').forEach(function (b) {
+                b.classList.toggle('active', b.dataset.themeBtn === theme);
+            });
+        });
     });
 });

@@ -18,7 +18,7 @@
         </div>
         <div class="header-actions">
             <a href="{{ url_for('report') }}" class="btn btn-secondary">📊 Report</a>
-            <a href="{{ url_for('buat_konten') }}" class="btn btn-primary">✨ Tambah Campaign</a>
+            <a href="{{ url_for('buat_konten') }}" class="btn btn-primary">✨ New Campaign</a>
         </div>
     </section>
 
@@ -31,7 +31,7 @@
         </div>
         <div class="stat-card stat-card-warning">
             <div class="stat-icon">⏰</div>
-            <div class="stat-label">Deadline H-5</div>
+            <div class="stat-label">Deadline</div>
             <div class="stat-value">{{ due_soon_count }}</div>
         </div>
         <div class="stat-card stat-card-success">
@@ -49,61 +49,57 @@
                 <span class="eyebrow">🌸 Workspace</span>
                 <h2>Daftar Campaign</h2>
             </div>
-            <span class="deadline-legend">⏰ Kuning = deadline H-5 atau kurang</span>
         </div>
 
         <div class="tracker-table-wrap">
             <table class="tracker-table">
                 <thead>
                     <tr>
-                        <th>Category</th>
                         <th>Brand</th>
-                        <th>Campaign / Project</th>
-                        <th>Payment</th>
-                        <th>Fee</th>
                         <th>SOW</th>
                         <th>Platform</th>
                         <th>Status</th>
                         <th>Deadline</th>
-                        <th>Product Knowledge</th>
-                        <th>Link Content</th>
-                        <th>Note</th>
                         <th>Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for k in konten_list.items %}
                     {% set status_class = (k.status or 'none')|lower|replace(' ', '-')|replace("'", '') %}
-                    <tr class="deadline-{{ k.deadline_state }}">
-                        <td data-label="Category">
-                            <span class="data-pill">{{ k.category or '-' }}</span>
-                        </td>
-                        <td data-label="Brand">{{ k.brand or '-' }}</td>
-                        <td data-label="Campaign/Project" class="strong-cell">{{ k.campaign_project or k.judul }}</td>
-                        <td data-label="Payment">
-                            <span class="payment-badge payment-{{ (k.payment or 'none')|lower }}">
-                                {{ k.payment or '-' }}
-                            </span>
-                        </td>
-                        <td data-label="Fee">{{ k.fee or '-' }}</td>
-                        <td data-label="SOW" class="truncate-cell" title="{{ k.sow or '' }}">{{ (k.sow or '-') | truncate(50, True, '…') }}</td>
+                    <tr class="deadline-{{ k.deadline_state }} clickable-row"
+                        data-brand="{{ (k.brand or '')|e }}"
+                        data-campaign="{{ (k.campaign_project or k.judul)|e }}"
+                        data-category="{{ (k.category or '')|e }}"
+                        data-payment="{{ (k.payment or '')|e }}"
+                        data-fee="{{ (k.fee or '')|e }}"
+                        data-sow="{{ (k.sow or '')|e }}"
+                        data-platform="{{ (k.platform or '')|e }}"
+                        data-status="{{ (k.status or '')|e }}"
+                        data-status-class="{{ status_class }}"
+                        data-deadline="{{ k.deadline_text }}"
+                        data-deadline-state="{{ k.deadline_state }}"
+                        data-pk="{{ (k.product_knowledge or '')|e }}"
+                        data-pk-link="{{ (k.product_knowledge_link or '')|e }}"
+                        data-link="{{ (k.link_content or '')|e }}"
+                        data-note="{{ (k.note or '')|e }}"
+                        data-edit-url="{{ url_for('edit_konten', id=k.id) }}"
+                        onclick="openCampaignDetail(this)">
+                        <td data-label="Brand" class="strong-cell">{{ k.brand or '-' }}</td>
+                        <td data-label="SOW" class="muted-cell">{{ (k.sow or '-')|truncate(48, True, '…') }}</td>
                         <td data-label="Platform">
                             <span class="data-pill platform-pill">{{ k.platform or '-' }}</span>
                         </td>
                         <td data-label="Status">
                             <span class="status-badge status-{{ status_class }}">{{ k.status or '-' }}</span>
                         </td>
-                        <td data-label="Deadline" class="deadline-cell">{{ k.deadline_text }}</td>
-                        <td data-label="Product Knowledge" class="truncate-cell" title="{{ k.product_knowledge or '' }}">{{ (k.product_knowledge or '-') | truncate(50, True, '…') }}</td>
-                        <td data-label="Link Content">
-                            {% if k.link_content %}
-                                <a href="{{ k.link_content }}" target="_blank" rel="noopener" class="table-link">🔗 Buka</a>
-                            {% else %}-{% endif %}
+                        <td data-label="Deadline" class="deadline-cell">
+                            {{ k.deadline_text }}
+                            {% if k.deadline_state == 'due-soon' %}<span class="deadline-soon-tag">H-5</span>{% endif %}
+                            {% if k.deadline_state == 'overdue' %}<span class="deadline-overdue-tag">Overdue</span>{% endif %}
                         </td>
-                        <td data-label="Note" class="truncate-cell" title="{{ k.note or '' }}">{{ (k.note or '-') | truncate(60, True, '…') }}</td>
-                        <td data-label="Aksi">
+                        <td data-label="Aksi" onclick="event.stopPropagation()">
                             <div class="table-actions">
-                                <a href="{{ url_for('edit_konten', id=k.id) }}" class="btn btn-secondary btn-sm">✏️ Edit</a>
+                                <a href="{{ url_for('edit_konten', id=k.id) }}" class="btn btn-secondary btn-sm">✏️</a>
                                 <form method="POST" action="{{ url_for('delete_konten', id=k.id) }}" class="konten-delete-form"
                                       data-delete-title="{{ (k.campaign_project or k.judul)|e }}">
                                     <button type="submit" class="btn btn-danger btn-sm">🗑️</button>
@@ -146,9 +142,29 @@
         <div class="empty-icon">🌸</div>
         <h3>Belum ada campaign nih!</h3>
         <p>Mulai tambah campaign pertama kamu. Semua deadline dan report akan tersusun otomatis 💕</p>
-        <a href="{{ url_for('buat_konten') }}" class="btn btn-primary">✨ Buat Campaign Pertama</a>
+        <a href="{{ url_for('buat_konten') }}" class="btn btn-primary">✨ New Campaign</a>
     </div>
     {% endif %}
 
+</div>
+
+<!-- Campaign Detail Panel -->
+<div class="detail-overlay" id="campaignDetailModal" hidden>
+    <div class="detail-backdrop" onclick="closeCampaignDetail()"></div>
+    <aside class="detail-panel">
+        <div class="detail-panel-header">
+            <div class="detail-panel-title">
+                <span class="eyebrow" id="detailCategory"></span>
+                <h2 id="detailCampaign"></h2>
+                <p class="detail-brand" id="detailBrand"></p>
+            </div>
+            <button class="detail-close-btn" onclick="closeCampaignDetail()">✕</button>
+        </div>
+        <div class="detail-panel-body" id="detailBody"></div>
+        <div class="detail-panel-footer">
+            <a id="detailEditBtn" href="#" class="btn btn-primary">✏️ Edit Campaign</a>
+            <button class="btn btn-secondary" onclick="closeCampaignDetail()">Tutup</button>
+        </div>
+    </aside>
 </div>
 {% endblock %}
