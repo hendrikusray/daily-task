@@ -291,7 +291,8 @@ document.addEventListener('DOMContentLoaded', function () {
         lily: '🌸',
         polka: '●',
         garden: '🌿',
-        floral: '✿'
+        floral: '✿',
+        cobalt: '✦'
     };
 
     function syncThemeControls(theme) {
