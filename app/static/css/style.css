@@ -1448,9 +1448,12 @@ span.flatpickr-weekday { color: var(--lily) !important; font-weight: 800 !import
     color: #3a5818;
 }
 
-/* Sidebar: clean cream, zero dots */
+/* Sidebar: cream + soft polka dots */
 [data-theme="polka"] .sidebar {
-    background: linear-gradient(180deg, #fdfaf0 0%, #f2edd8 100%);
+    background:
+        radial-gradient(circle at center, rgba(218,72,138,0.18) 36%, transparent 37%) 0 0 / 20px 20px,
+        radial-gradient(circle at center, rgba(218,72,138,0.18) 36%, transparent 37%) 10px 10px / 20px 20px,
+        linear-gradient(180deg, #fdfaf0 0%, #f2edd8 100%);
     border-right: 1.5px solid #ccdcaa;
     box-shadow: 2px 0 12px rgba(80,112,32,0.10);
 }
