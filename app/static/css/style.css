@@ -658,12 +658,7 @@ tr.deadline-overdue  .deadline-cell::before { content: "🚨 "; }
 tr.deadline-done     .deadline-cell { color: var(--sage); }
 
 .strong-cell   { min-width: 180px; font-weight: 800; }
-.truncate-cell {
-    min-width: 160px; max-width: 220px;
-    color: var(--muted); font-size: 13px; line-height: 1.45;
-    max-height: 2.9em;
-    overflow: hidden;
-}
+.truncate-cell { min-width: 160px; max-width: 220px; color: var(--muted); font-size: 13px; line-height: 1.45; }
 
 /* === BADGES & PILLS === */
 .data-pill, .payment-badge, .status-badge {
@@ -939,7 +934,7 @@ span.flatpickr-weekday { color: var(--lily) !important; font-weight: 800 !import
     .tracker-table .strong-cell::before { margin-bottom: -2px; }
     .tracker-table td[data-label="Deadline"] { order: -2; }
     .tracker-table td[data-label="Status"]   { order: -1; }
-    .truncate-cell { min-width: 0; max-width: none; max-height: 4.35em; }
+    .truncate-cell { min-width: 0; max-width: none; }
     .deadline-cell { white-space: normal; }
     .table-actions { display: flex; gap: 8px; width: 100%; min-width: 0; }
     .table-actions .btn { flex: 1; }

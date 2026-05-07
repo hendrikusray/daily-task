@@ -86,7 +86,7 @@
                             </span>
                         </td>
                         <td data-label="Fee">{{ k.fee or '-' }}</td>
-                        <td data-label="SOW" class="truncate-cell">{{ k.sow or '-' }}</td>
+                        <td data-label="SOW" class="truncate-cell" title="{{ k.sow or '' }}">{{ (k.sow or '-') | truncate(50, True, '…') }}</td>
                         <td data-label="Platform">
                             <span class="data-pill platform-pill">{{ k.platform or '-' }}</span>
                         </td>
@@ -94,13 +94,13 @@
                             <span class="status-badge status-{{ status_class }}">{{ k.status or '-' }}</span>
                         </td>
                         <td data-label="Deadline" class="deadline-cell">{{ k.deadline_text }}</td>
-                        <td data-label="Product Knowledge" class="truncate-cell">{{ k.product_knowledge or '-' }}</td>
+                        <td data-label="Product Knowledge" class="truncate-cell" title="{{ k.product_knowledge or '' }}">{{ (k.product_knowledge or '-') | truncate(50, True, '…') }}</td>
                         <td data-label="Link Content">
                             {% if k.link_content %}
                                 <a href="{{ k.link_content }}" target="_blank" rel="noopener" class="table-link">🔗 Buka</a>
                             {% else %}-{% endif %}
                         </td>
-                        <td data-label="Note" class="truncate-cell">{{ k.note or '-' }}</td>
+                        <td data-label="Note" class="truncate-cell" title="{{ k.note or '' }}">{{ (k.note or '-') | truncate(60, True, '…') }}</td>
                         <td data-label="Aksi">
                             <div class="table-actions">
                                 <a href="{{ url_for('edit_konten', id=k.id) }}" class="btn btn-secondary btn-sm">✏️ Edit</a>
