@@ -2,6 +2,17 @@
 ;(function () {
     var loader = document.getElementById('pageLoader');
     if (!loader) return;
+
+    var navEntry = performance.getEntriesByType('navigation')[0];
+    var navType  = navEntry ? navEntry.type : 'navigate';
+    var ref      = document.referrer;
+    var sameOrigin = ref && ref.startsWith(location.origin);
+    var fromLogin  = sameOrigin && /\/(login|register)/.test(ref);
+    // Internal nav = same-origin referrer that isn't the login page, and not a reload
+    var isInternal = sameOrigin && !fromLogin && navType !== 'reload';
+
+    if (isInternal) { loader.style.display = 'none'; return; }
+
     var t0 = Date.now();
     var MIN_MS = 3000;
 
@@ -13,11 +24,8 @@
         }, wait);
     }
 
-    if (document.readyState === 'complete') {
-        hideLoader();
-    } else {
-        window.addEventListener('load', hideLoader);
-    }
+    if (document.readyState === 'complete') { hideLoader(); }
+    else { window.addEventListener('load', hideLoader); }
 }());
 
 // === PASSWORD TOGGLE ===
