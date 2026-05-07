@@ -389,6 +389,129 @@ body.modal-open { overflow: hidden; }
     gap: 10px;
 }
 
+/* === MOBILE THEME SHEET === */
+.mobile-theme-sheet[hidden] { display: none !important; }
+
+.mobile-theme-sheet {
+    position: fixed;
+    inset: 0;
+    z-index: 520;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding: 14px;
+}
+
+.mobile-theme-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(44, 26, 20, 0.34);
+    backdrop-filter: blur(7px);
+}
+
+.mobile-theme-panel {
+    position: relative;
+    z-index: 1;
+    width: min(100%, 460px);
+    padding: 10px 16px 18px;
+    overflow: hidden;
+    background:
+        linear-gradient(rgba(255,254,251,0.94), rgba(255,254,251,0.98)),
+        url("../images/floral-pattern.svg"),
+        var(--surface);
+    background-position: 0 0, right -54px top -42px, 0 0;
+    background-size: auto, 210px 210px, auto;
+    border: 1.5px solid rgba(237,217,200,0.92);
+    border-radius: 24px;
+    box-shadow: 0 -18px 60px rgba(44,26,20,0.24), var(--shadow);
+    animation: slideInUp .2s ease;
+}
+
+.mobile-sheet-handle {
+    width: 44px;
+    height: 5px;
+    margin: 0 auto 14px;
+    background: rgba(140,106,82,0.24);
+    border-radius: var(--r-pill);
+}
+
+.mobile-theme-header {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 14px;
+    margin-bottom: 14px;
+}
+
+.mobile-theme-header h2 {
+    margin-top: 3px;
+    color: var(--ink);
+    font-size: 20px;
+    font-weight: 900;
+    line-height: 1.2;
+}
+
+.mobile-theme-options {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.theme-choice {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 72px;
+    padding: 12px;
+    color: var(--ink-soft);
+    background: rgba(255,254,251,0.82);
+    border: 1.5px solid var(--line-soft);
+    border-radius: 16px;
+    box-shadow: var(--shadow-card);
+    font-family: inherit;
+    text-align: left;
+    cursor: pointer;
+    backdrop-filter: blur(5px);
+    transition: border-color .16s, box-shadow .16s, transform .16s, background .16s;
+}
+
+.theme-choice strong,
+.theme-choice small {
+    display: block;
+    line-height: 1.25;
+}
+
+.theme-choice strong {
+    color: var(--ink);
+    font-size: 14px;
+    font-weight: 900;
+}
+
+.theme-choice small {
+    margin-top: 3px;
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.theme-choice:hover,
+.theme-choice.active {
+    background: rgba(255,248,252,0.96);
+    border-color: rgba(168,43,92,0.26);
+    box-shadow: 0 10px 24px rgba(168,43,92,0.14);
+    transform: translateY(-1px);
+}
+
+.theme-choice.active .theme-dot {
+    border-color: var(--lily);
+    box-shadow: 0 4px 12px var(--lily-glow);
+    transform: scale(1.08);
+}
+
 /* ================================================================
    SIDEBAR — lily garden background
    ================================================================ */
@@ -523,6 +646,25 @@ body.modal-open { overflow: hidden; }
     transition: background 0.2s, color 0.2s;
 }
 .logout-link:hover { color: white; background: var(--lily); border-color: var(--lily); }
+
+.mobile-theme-trigger {
+    display: none;
+    align-items: center;
+    gap: 7px;
+    min-height: 36px;
+    padding: 7px 14px;
+    color: var(--ink-soft);
+    background: rgba(255,254,251,0.92);
+    border: 1.5px solid var(--line);
+    border-radius: var(--r-pill);
+    box-shadow: var(--shadow-card);
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 900;
+    cursor: pointer;
+}
+
+.theme-trigger-icon { line-height: 1; }
 
 /* === EYEBROW === */
 .eyebrow {
@@ -1278,8 +1420,8 @@ span.flatpickr-weekday { color: var(--lily) !important; font-weight: 800 !import
 /* Tracker-header: full olive polka — ini satu-satunya tempat dots tampil */
 [data-theme="polka"] .tracker-header {
     background:
-        radial-gradient(circle at center, #f5c8d2 38%, transparent 39%) 0 0 / 34px 34px,
-        radial-gradient(circle at center, #f5c8d2 38%, transparent 39%) 17px 17px / 34px 34px,
+        radial-gradient(circle at center, #f5c8d2 36%, transparent 37%) 0 0 / 20px 20px,
+        radial-gradient(circle at center, #f5c8d2 36%, transparent 37%) 10px 10px / 20px 20px,
         #7a9840;
     border-color: #6a8830;
     box-shadow: var(--shadow-card);
@@ -1306,11 +1448,11 @@ span.flatpickr-weekday { color: var(--lily) !important; font-weight: 800 !import
     color: #3a5818;
 }
 
-/* Sidebar: clean cream, zero dots — tidak perlu bersaing dengan header */
+/* Sidebar: clean cream, zero dots */
 [data-theme="polka"] .sidebar {
-    background: linear-gradient(180deg, #fdfaf0 0%, #f8f4e4 100%);
-    border-right-color: var(--line);
-    box-shadow: 4px 0 16px rgba(80,112,32,0.06);
+    background: linear-gradient(180deg, #fdfaf0 0%, #f2edd8 100%);
+    border-right: 1.5px solid #ccdcaa;
+    box-shadow: 2px 0 12px rgba(80,112,32,0.10);
 }
 [data-theme="polka"] .sidebar::before { display: none; }
 [data-theme="polka"] .sidebar::after  { display: none; }
@@ -1472,6 +1614,7 @@ span.flatpickr-weekday { color: var(--lily) !important; font-weight: 800 !import
     display: flex; gap: 8px; padding: 0 6px;
 }
 .theme-dot {
+    display: inline-flex;
     width: 24px; height: 24px; border-radius: 50%;
     border: 2.5px solid transparent;
     cursor: pointer; transition: transform .15s, border-color .15s, box-shadow .15s;
@@ -1488,4 +1631,10 @@ span.flatpickr-weekday { color: var(--lily) !important; font-weight: 800 !import
 
 @media (max-width: 768px) {
     .theme-picker-wrap { display: none; }
+    .mobile-theme-trigger { display: inline-flex; }
+    .top-actions { justify-content: space-between; }
+}
+
+@media (max-width: 420px) {
+    .mobile-theme-options { grid-template-columns: 1fr; }
 }
