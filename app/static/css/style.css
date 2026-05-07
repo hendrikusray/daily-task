@@ -2416,3 +2416,66 @@ body[data-theme="polka"].auth-page::after {
         background: linear-gradient(135deg, #f4f1e3 0%, #e5edcf 100%);
     }
 }
+
+/* ============================================================
+   MOBILE CAMPAIGN CARD — redesign total, no ugly labels
+   ============================================================ */
+@media (max-width: 768px) {
+    /* Card shape */
+    .tracker-table tr { border-radius: 14px; border-left-width: 4px; }
+
+    /* Hide ALL data-label prefixes */
+    .tracker-table td::before { display: none !important; }
+
+    /* Cells: flex row instead of grid */
+    .tracker-table td {
+        display: flex !important;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 6px;
+        padding: 8px 14px;
+        border-bottom: 1px solid var(--line-soft);
+    }
+    .tracker-table td:last-child { border-bottom: none; }
+
+    /* Brand — card headline */
+    .tracker-table .strong-cell {
+        padding: 14px 14px 12px;
+        font-size: 16px; font-weight: 800;
+        border-bottom: 1.5px solid var(--line-soft);
+    }
+
+    /* SOW — disembunyikan, bisa lihat di detail panel */
+    .tracker-table .muted-cell { display: none !important; }
+
+    /* Status — badge saja */
+    .tracker-table td[data-label="Status"] {
+        order: -1;
+        padding: 8px 14px 4px;
+        border-bottom: none;
+    }
+
+    /* Deadline — compact, muted */
+    .tracker-table td[data-label="Deadline"] {
+        order: -2;
+        padding: 4px 14px 8px;
+        font-size: 13px; color: var(--muted);
+        border-bottom: 1px solid var(--line-soft);
+    }
+
+    /* Platform — pill saja, jangan terlalu tebal */
+    .tracker-table td[data-label="Platform"] {
+        padding: 8px 14px;
+    }
+
+    /* Aksi — bottom bar dengan bg soft */
+    .tracker-table td[data-label="Aksi"] {
+        background: var(--surface-soft);
+        border-top: 1.5px solid var(--line-soft);
+        border-bottom: none;
+        border-radius: 0 0 12px 12px;
+        padding: 10px 14px 12px;
+        gap: 8px;
+    }
+    .table-actions .btn-sm { min-height: 40px; flex: 1; font-size: 16px; }
+}
