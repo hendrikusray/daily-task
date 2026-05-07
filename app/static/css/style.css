@@ -2403,3 +2403,16 @@ body[data-theme="polka"].auth-page::after {
         gap: 12px;
     }
 }
+
+/* --- Polka mobile: hapus dots dari stat cards, terlalu ramai di layar kecil --- */
+@media (max-width: 768px) {
+    [data-theme="polka"] .stat-card-total {
+        background: linear-gradient(135deg, #f7f4e8 0%, #edf2dc 100%);
+    }
+    [data-theme="polka"] .stat-card-warning {
+        background: linear-gradient(135deg, #fbf5e9 0%, #f6eadc 100%);
+    }
+    [data-theme="polka"] .stat-card-success {
+        background: linear-gradient(135deg, #f4f1e3 0%, #e5edcf 100%);
+    }
+}
