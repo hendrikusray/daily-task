@@ -1474,6 +1474,9 @@ body[data-theme="polka"].auth-page::after {
     box-shadow: var(--shadow-card);
     backdrop-filter: blur(10px);
 }
+[data-theme="polka"] .tracker-form-container {
+    overflow: hidden;
+}
 
 [data-theme="polka"] .auth-container {
     overflow: hidden;
@@ -1497,10 +1500,10 @@ body[data-theme="polka"].auth-page::after {
 [data-theme="polka"] .tracker-header {
     background-color: #849751;
     background-image:
-        radial-gradient(circle at 16px 16px, rgba(255,225,230,0.90) 0 9px, transparent 9.8px),
-        radial-gradient(circle at 62px 62px, rgba(255,225,230,0.76) 0 9px, transparent 9.8px),
+        radial-gradient(circle at 12px 12px, rgba(255,225,230,0.42) 0 6px, transparent 6.7px),
+        radial-gradient(circle at 38px 38px, rgba(255,225,230,0.34) 0 6px, transparent 6.7px),
         linear-gradient(135deg, #8fa151 0%, #718940 100%);
-    background-size: 92px 92px, 92px 92px, auto;
+    background-size: 52px 52px, 52px 52px, auto;
     border-color: rgba(255,244,232,0.36);
     box-shadow: 0 18px 42px rgba(45,58,20,0.20);
 }
@@ -1532,10 +1535,10 @@ body[data-theme="polka"].auth-page::after {
 [data-theme="polka"] .sidebar {
     background-color: var(--polka-olive-dark);
     background-image:
-        radial-gradient(circle at 13px 13px, rgba(255,215,221,0.72) 0 7px, transparent 7.8px),
-        radial-gradient(circle at 47px 47px, rgba(255,215,221,0.66) 0 7px, transparent 7.8px),
+        radial-gradient(circle at 10px 10px, rgba(255,225,230,0.38) 0 5px, transparent 5.7px),
+        radial-gradient(circle at 32px 32px, rgba(255,225,230,0.30) 0 5px, transparent 5.7px),
         linear-gradient(180deg, #8fa151 0%, #70863a 100%);
-    background-size: 68px 68px, 68px 68px, auto;
+    background-size: 44px 44px, 44px 44px, auto;
     border-right-color: rgba(255,248,235,0.28);
     box-shadow: 4px 0 22px rgba(45,58,20,0.18);
 }
@@ -1615,29 +1618,14 @@ body[data-theme="polka"].auth-page::after {
     display: none;
 }
 [data-theme="polka"] .stat-card-total {
-    background-color: var(--polka-olive-deep);
-    background-image:
-        radial-gradient(circle at 10px 10px, rgba(255,215,221,0.64) 0 6px, transparent 6.8px),
-        radial-gradient(circle at 42px 42px, rgba(255,215,221,0.58) 0 6px, transparent 6.8px),
-        linear-gradient(135deg, #526829 0%, #7f9747 100%);
-    background-size: 64px 64px, 64px 64px, auto;
+    background: linear-gradient(135deg, #526829 0%, #7f9747 100%);
 }
 [data-theme="polka"] .stat-card-warning {
     color: #4c4128;
-    background-color: var(--polka-blush);
-    background-image:
-        radial-gradient(circle at 10px 10px, rgba(255,253,247,0.62) 0 6px, transparent 6.8px),
-        radial-gradient(circle at 42px 42px, rgba(255,253,247,0.50) 0 6px, transparent 6.8px),
-        linear-gradient(135deg, #ffd7dd 0%, #f0c1ca 100%);
-    background-size: 64px 64px, 64px 64px, auto;
+    background: linear-gradient(135deg, #ffe2e7 0%, #f3c5cd 100%);
 }
 [data-theme="polka"] .stat-card-success {
-    background-color: #667d39;
-    background-image:
-        radial-gradient(circle at 10px 10px, rgba(255,248,235,0.44) 0 6px, transparent 6.8px),
-        radial-gradient(circle at 42px 42px, rgba(255,248,235,0.36) 0 6px, transparent 6.8px),
-        linear-gradient(135deg, #5c7432 0%, #91a654 100%);
-    background-size: 64px 64px, 64px 64px, auto;
+    background: linear-gradient(135deg, #5c7432 0%, #91a654 100%);
 }
 
 [data-theme="polka"] .sheet-toolbar,
@@ -1645,10 +1633,23 @@ body[data-theme="polka"].auth-page::after {
 [data-theme="polka"] .detail-panel-footer,
 [data-theme="polka"] .form-heading,
 [data-theme="polka"] .profile-header {
-    background:
-        radial-gradient(circle at 8px 8px, rgba(255,215,221,0.44) 0 4px, transparent 4.6px) 0 0 / 34px 34px,
-        linear-gradient(135deg, #fff8eb 0%, #f3f1dc 100%);
+    background: linear-gradient(135deg, #fff8eb 0%, #f3f1dc 100%);
     border-color: var(--line-soft);
+}
+[data-theme="polka"] .tracker-form-container .form-heading {
+    margin: -32px -32px 24px;
+    padding: 28px 32px 20px;
+    background:
+        radial-gradient(circle at 10px 10px, rgba(255,225,230,0.38) 0 5px, transparent 5.7px),
+        radial-gradient(circle at 32px 32px, rgba(255,225,230,0.28) 0 5px, transparent 5.7px),
+        linear-gradient(135deg, #fff8eb 0%, #f1efd9 100%);
+    background-size: 44px 44px, 44px 44px, auto;
+}
+@media (max-width: 480px) {
+    [data-theme="polka"] .tracker-form-container .form-heading {
+        margin: -18px -18px 22px;
+        padding: 22px 18px 18px;
+    }
 }
 [data-theme="polka"] .tracker-table th {
     background: #eef3da;
@@ -1738,9 +1739,7 @@ body[data-theme="polka"].auth-page::after {
 }
 [data-theme="polka"] .delete-dialog,
 [data-theme="polka"] .mobile-theme-panel {
-    background:
-        radial-gradient(circle at 10px 10px, rgba(255,215,221,0.42) 0 5px, transparent 5.8px) 0 0 / 42px 42px,
-        rgba(255,253,247,0.97);
+    background: rgba(255,253,247,0.97);
     border-color: rgba(255,215,221,0.68);
     box-shadow: 0 24px 70px rgba(43,52,20,0.28);
 }
@@ -1765,8 +1764,7 @@ body[data-theme="polka"].auth-page::after {
     border-color: rgba(255,215,221,0.72);
 }
 [data-theme="polka"] .empty-state::before {
-    background:
-        radial-gradient(circle at 10px 10px, rgba(255,215,221,0.58) 0 7px, transparent 7.8px) 0 0 / 48px 48px;
+    background: radial-gradient(circle, rgba(255,215,221,0.58), transparent 68%);
 }
 
 [data-theme="polka"] .theme-dot.active,
@@ -2066,11 +2064,16 @@ body[data-theme="polka"].auth-page::after {
 /* ─── Loader theme variants ─── */
 [data-theme="polka"] .page-loader {
     background:
-        radial-gradient(circle at center, rgba(245,200,210,0.42) 36%, transparent 37%) 0 0 / 20px 20px,
-        radial-gradient(circle at center, rgba(245,200,210,0.42) 36%, transparent 37%) 10px 10px / 20px 20px,
-        #f8f4ea;
+        radial-gradient(circle at center, #f5c8d2 36%, transparent 37%) 0 0 / 20px 20px,
+        radial-gradient(circle at center, #f5c8d2 36%, transparent 37%) 10px 10px / 20px 20px,
+        #7a9840;
 }
 [data-theme="polka"] .page-loader::before { display: none; }
+[data-theme="polka"] .loader-name { color: #fff; }
+[data-theme="polka"] .loader-dots span { background: rgba(255,255,255,0.80); }
+[data-theme="polka"] .loader-lily-svg ellipse { fill: #f5c8d2; }
+[data-theme="polka"] .loader-stamen-outer { fill: rgba(255,243,220,0.95); }
+[data-theme="polka"] .loader-stamen-inner { fill: rgba(180,110,30,0.90); }
 
 [data-theme="garden"] .page-loader {
     background:
