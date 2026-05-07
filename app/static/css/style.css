@@ -703,9 +703,26 @@ body.modal-open { overflow: hidden; }
 .tracker-header {
     display: flex; align-items: center; justify-content: space-between;
     gap: 20px; padding: 22px 26px;
-    background: var(--surface); border: 1.5px solid var(--line-soft);
+    background:
+        radial-gradient(circle at 8% 50%, rgba(255,232,242,0.65) 0 70px, transparent 140px),
+        radial-gradient(circle at 92% 30%, rgba(255,243,224,0.75) 0 60px, transparent 120px),
+        linear-gradient(180deg, rgba(255,254,251,0.98) 0%, rgba(255,247,240,0.95) 100%),
+        var(--surface);
+    border: 1.5px solid var(--line-soft);
     border-radius: var(--r); box-shadow: var(--shadow-card);
     position: relative; overflow: hidden;
+}
+.tracker-header::before {
+    content: "";
+    position: absolute; inset: 0; z-index: 0;
+    background:
+        linear-gradient(rgba(255,254,251,0.50), rgba(255,254,251,0.66)),
+        url("../images/lily-pattern.svg");
+    background-position: 0 0, 20px -8px;
+    background-repeat: repeat, repeat;
+    background-size: auto, 180px 150px;
+    opacity: 0.48;
+    pointer-events: none;
 }
 .tracker-header::after {
     content: "";
@@ -713,6 +730,7 @@ body.modal-open { overflow: hidden; }
     width: 140px; height: 140px;
     background: radial-gradient(ellipse at 100% 0%, var(--lily-glow) 0%, transparent 70%);
     pointer-events: none;
+    z-index: 0;
 }
 
 .header-title { display: flex; align-items: center; gap: 16px; min-width: 0; position: relative; z-index: 1; }
@@ -1498,33 +1516,35 @@ body[data-theme="polka"].auth-page::after {
 
 /* Polka hero panel */
 [data-theme="polka"] .tracker-header {
-    background-color: #849751;
+    background-color: #f1efd9;
     background-image:
-        radial-gradient(circle at 12px 12px, rgba(255,225,230,0.42) 0 6px, transparent 6.7px),
-        radial-gradient(circle at 38px 38px, rgba(255,225,230,0.34) 0 6px, transparent 6.7px),
-        linear-gradient(135deg, #8fa151 0%, #718940 100%);
-    background-size: 52px 52px, 52px 52px, auto;
-    border-color: rgba(255,244,232,0.36);
-    box-shadow: 0 18px 42px rgba(45,58,20,0.20);
+        radial-gradient(circle at 12px 12px, rgba(143,161,81,0.20) 0 5px, transparent 5.8px),
+        radial-gradient(circle at 40px 34px, rgba(255,196,207,0.22) 0 6px, transparent 6.8px),
+        linear-gradient(135deg, #fbf5e9 0%, #edf2dc 100%);
+    background-size: 56px 56px, 74px 74px, auto;
+    border-color: rgba(143,161,81,0.24);
+    box-shadow: 0 14px 34px rgba(45,58,20,0.12);
 }
 [data-theme="polka"] .tracker-header::after { display: none; }
-[data-theme="polka"] .tracker-header .eyebrow { color: rgba(255,248,238,0.82); }
-[data-theme="polka"] .tracker-header h1 { color: #fffef8; text-shadow: 0 1px 1px rgba(44,54,20,0.16); }
-[data-theme="polka"] .tracker-header p { color: rgba(255,254,248,0.82); }
+[data-theme="polka"] .tracker-header .eyebrow { color: var(--polka-olive-deep); }
+[data-theme="polka"] .tracker-header h1 { color: #2f351f; text-shadow: none; }
+[data-theme="polka"] .tracker-header p { color: #747a50; }
 [data-theme="polka"] .header-avatar {
-    color: var(--polka-olive-deep) !important;
-    background: rgba(255,248,235,0.94) !important;
-    box-shadow: 0 10px 24px rgba(44,54,20,0.18) !important;
+    color: #40511f !important;
+    background: #fff7ea !important;
+    border: 1.5px solid rgba(143,161,81,0.18);
+    box-shadow: 0 10px 22px rgba(45,58,20,0.10) !important;
 }
 [data-theme="polka"] .tracker-header .btn {
     color: #40551d;
-    background: rgba(255,248,235,0.94);
-    border-color: rgba(255,255,255,0.34);
-    box-shadow: 0 8px 18px rgba(44,54,20,0.14);
+    background: rgba(255,253,247,0.92);
+    border-color: rgba(143,161,81,0.20);
+    box-shadow: 0 8px 18px rgba(45,58,20,0.08);
 }
 [data-theme="polka"] .tracker-header .btn-primary {
     color: #344718;
-    background: #ffe7ec;
+    background: #ffe4ea;
+    border-color: rgba(255,196,207,0.58);
 }
 [data-theme="polka"] .tracker-header .btn:hover {
     background: #fffdf7;
