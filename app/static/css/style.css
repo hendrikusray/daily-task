@@ -2064,16 +2064,11 @@ body[data-theme="polka"].auth-page::after {
 /* ─── Loader theme variants ─── */
 [data-theme="polka"] .page-loader {
     background:
-        radial-gradient(circle at center, #f5c8d2 36%, transparent 37%) 0 0 / 20px 20px,
-        radial-gradient(circle at center, #f5c8d2 36%, transparent 37%) 10px 10px / 20px 20px,
-        #7a9840;
+        radial-gradient(circle at center, rgba(218,72,138,0.12) 36%, transparent 37%) 0 0 / 20px 20px,
+        radial-gradient(circle at center, rgba(218,72,138,0.12) 36%, transparent 37%) 10px 10px / 20px 20px,
+        #f8f4ea;
 }
 [data-theme="polka"] .page-loader::before { display: none; }
-[data-theme="polka"] .loader-name { color: #fff; }
-[data-theme="polka"] .loader-dots span { background: rgba(255,255,255,0.80); }
-[data-theme="polka"] .loader-lily-svg ellipse { fill: #f5c8d2; }
-[data-theme="polka"] .loader-stamen-outer { fill: rgba(255,243,220,0.95); }
-[data-theme="polka"] .loader-stamen-inner { fill: rgba(180,110,30,0.90); }
 
 [data-theme="garden"] .page-loader {
     background:
