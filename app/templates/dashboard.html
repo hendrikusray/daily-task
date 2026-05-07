@@ -84,7 +84,23 @@
                         data-note="{{ (k.note or '')|e }}"
                         data-edit-url="{{ url_for('edit_konten', id=k.id) }}"
                         onclick="openCampaignDetail(this)">
-                        <td data-label="Brand" class="strong-cell">{{ k.brand or '-' }}</td>
+                        <td data-label="Brand" class="strong-cell">
+                            <span class="mobile-card-brand">{{ k.brand or '-' }}</span>
+                            <div class="mobile-card-meta" aria-label="Ringkasan campaign">
+                                {% if k.campaign_project or k.judul %}
+                                    <span><strong>Project</strong>{{ k.campaign_project or k.judul }}</span>
+                                {% endif %}
+                                {% if k.category %}
+                                    <span><strong>Category</strong>{{ k.category }}</span>
+                                {% endif %}
+                                {% if k.payment %}
+                                    <span><strong>Payment</strong>{{ k.payment }}</span>
+                                {% endif %}
+                                {% if k.fee %}
+                                    <span><strong>Fee</strong>{{ k.fee }}</span>
+                                {% endif %}
+                            </div>
+                        </td>
                         <td data-label="SOW" class="muted-cell">{{ (k.sow or '-')|truncate(48, True, '…') }}</td>
                         <td data-label="Platform">
                             <span class="data-pill platform-pill">{{ k.platform or '-' }}</span>
