@@ -1610,22 +1610,37 @@ body[data-theme="polka"].auth-page::after {
 }
 
 [data-theme="polka"] .stat-card {
-    border: 1px solid rgba(255,253,247,0.30);
-    box-shadow: 0 14px 32px rgba(45,58,20,0.16);
+    color: #40511f;
+    border: 1.5px solid rgba(143,161,81,0.24);
+    box-shadow: 0 12px 28px rgba(45,58,20,0.10);
 }
 [data-theme="polka"] .stat-card::before,
 [data-theme="polka"] .stat-card::after {
     display: none;
 }
 [data-theme="polka"] .stat-card-total {
-    background: linear-gradient(135deg, #526829 0%, #7f9747 100%);
+    background:
+        radial-gradient(circle at 12px 12px, rgba(143,161,81,0.18) 0 5px, transparent 5.7px),
+        radial-gradient(circle at 42px 38px, rgba(255,215,221,0.18) 0 6px, transparent 6.8px),
+        linear-gradient(135deg, #f7f4e8 0%, #edf2dc 100%);
+    background-size: 58px 58px, 72px 72px, auto;
 }
 [data-theme="polka"] .stat-card-warning {
-    color: #4c4128;
-    background: linear-gradient(135deg, #ffe2e7 0%, #f3c5cd 100%);
+    color: #514526;
+    background:
+        radial-gradient(circle at 10px 14px, rgba(255,196,207,0.24) 0 5px, transparent 5.8px),
+        radial-gradient(circle at 38px 34px, rgba(143,161,81,0.12) 0 6px, transparent 6.8px),
+        linear-gradient(135deg, #fbf5e9 0%, #f6eadc 100%);
+    background-size: 50px 50px, 68px 68px, auto;
+    border-color: rgba(188,135,56,0.20);
 }
 [data-theme="polka"] .stat-card-success {
-    background: linear-gradient(135deg, #5c7432 0%, #91a654 100%);
+    color: #40511f;
+    background:
+        radial-gradient(circle at 14px 10px, rgba(143,161,81,0.16) 0 4px, transparent 4.7px),
+        radial-gradient(circle at 36px 38px, rgba(255,225,230,0.16) 0 6px, transparent 6.8px),
+        linear-gradient(135deg, #f4f1e3 0%, #e5edcf 100%);
+    background-size: 46px 46px, 70px 70px, auto;
 }
 
 [data-theme="polka"] .sheet-toolbar,
@@ -1973,7 +1988,10 @@ body[data-theme="polka"].auth-page::after {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--bg);
+    background:
+        radial-gradient(circle at 18% 20%, rgba(255,232,242,0.72) 0 80px, transparent 160px),
+        radial-gradient(circle at 82% 80%, rgba(255,243,224,0.88) 0 90px, transparent 180px),
+        linear-gradient(180deg, #FDFAF4 0%, #FFF5EC 100%);
     transition: opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1),
                 transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
     will-change: opacity, transform;
@@ -1982,8 +2000,13 @@ body[data-theme="polka"].auth-page::after {
     content: "";
     position: absolute;
     inset: 0;
-    background: url("../images/lily-pattern.svg") repeat center / 240px 200px;
-    opacity: 0.07;
+    background:
+        linear-gradient(rgba(255,254,251,0.42), rgba(255,254,251,0.64)),
+        url("../images/lily-pattern.svg");
+    background-position: 0 0, -46px 24px;
+    background-repeat: repeat, repeat;
+    background-size: auto, 210px 175px;
+    opacity: 0.45;
     pointer-events: none;
 }
 .page-loader.loader-out {
