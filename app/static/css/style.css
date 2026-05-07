@@ -1255,34 +1255,65 @@ span.flatpickr-weekday { color: var(--lily) !important; font-weight: 800 !import
 
 /* ─── POLKA (olive + pink polka dots) ─── */
 [data-theme="polka"] {
-    --bg: #f4f9ee;            /* fallback only — body bg overridden below */
-    --surface: #fffefb;
-    --surface-soft: #f5fbed;
-    --muted: #6a8a4a;
-    --line: #c0d8a8;
-    --line-soft: #dff0d0;
+    --bg: #f8f4ea;
+    --surface: #ffffff;
+    --surface-soft: #f5f0e4;
+    --muted: #7a8c5a;
+    --line: #ccdcaa;
+    --line-soft: #e4f0cc;
 
-    --lily: #5c8230;
-    --lily-dark: #486822;
-    --lily-light: #76a448;
-    --lily-pale: #e4f5d4;
-    --lily-glow: rgba(92,130,48,0.15);
+    --lily: #6a8c36;
+    --lily-dark: #527020;
+    --lily-light: #88b048;
+    --lily-pale: #e8f5d0;
+    --lily-glow: rgba(106,140,54,0.16);
 
-    --grad-primary: linear-gradient(135deg, #5c8230 0%, #76a448 100%);
-    --grad-lily-bg: linear-gradient(135deg, #e4f5d4 0%, #f0fbe0 100%);
-    --shadow:      0 20px 48px rgba(92,130,48,0.13);
-    --shadow-soft: 0 8px  24px rgba(92,130,48,0.09);
-    --shadow-card: 0 2px  14px rgba(92,130,48,0.07);
+    --grad-primary: linear-gradient(135deg, #6a8c36 0%, #88b048 100%);
+    --grad-lily-bg: linear-gradient(135deg, #e8f5d0 0%, #f8ffe0 100%);
+    --shadow:      0 20px 48px rgba(80,112,32,0.13);
+    --shadow-soft: 0 8px  24px rgba(80,112,32,0.09);
+    --shadow-card: 0 2px  14px rgba(80,112,32,0.07);
 }
-/* tracker-header → polka dot pattern only here */
+
+/* Tracker-header: full olive polka — ini satu-satunya tempat dots tampil */
 [data-theme="polka"] .tracker-header {
     background:
-        radial-gradient(circle at center, rgba(245,201,208,0.55) 30%, transparent 31%) 0 0 / 34px 34px,
-        radial-gradient(circle at center, rgba(245,201,208,0.55) 30%, transparent 31%) 17px 17px / 34px 34px,
-        #d8edbb;
-    border-color: #c0d8a0;
+        radial-gradient(circle at center, #f5c8d2 38%, transparent 39%) 0 0 / 34px 34px,
+        radial-gradient(circle at center, #f5c8d2 38%, transparent 39%) 17px 17px / 34px 34px,
+        #7a9840;
+    border-color: #6a8830;
+    box-shadow: var(--shadow-card);
 }
 [data-theme="polka"] .tracker-header::after { display: none; }
+/* Text putih supaya terbaca di atas olive */
+[data-theme="polka"] .tracker-header .eyebrow { color: rgba(255,255,255,0.72); }
+[data-theme="polka"] .tracker-header h1       { color: #fff; }
+[data-theme="polka"] .tracker-header p        { color: rgba(255,255,255,0.76); }
+[data-theme="polka"] .header-avatar {
+    background: rgba(255,255,255,0.92) !important;
+    color: #5a8028 !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12) !important;
+}
+/* Buttons di header jadi putih supaya kontras */
+[data-theme="polka"] .tracker-header .btn {
+    background: rgba(255,255,255,0.92);
+    border-color: transparent;
+    color: #4a6c22;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+}
+[data-theme="polka"] .tracker-header .btn:hover {
+    background: #fff;
+    color: #3a5818;
+}
+
+/* Sidebar: clean cream, zero dots — tidak perlu bersaing dengan header */
+[data-theme="polka"] .sidebar {
+    background: linear-gradient(180deg, #fdfaf0 0%, #f8f4e4 100%);
+    border-right-color: var(--line);
+    box-shadow: 4px 0 16px rgba(80,112,32,0.06);
+}
+[data-theme="polka"] .sidebar::before { display: none; }
+[data-theme="polka"] .sidebar::after  { display: none; }
 
 /* Garden: watercolor blobs only on tracker-header */
 [data-theme="garden"] .tracker-header {
@@ -1295,45 +1326,6 @@ span.flatpickr-weekday { color: var(--lily) !important; font-weight: 800 !import
     border-color: var(--line);
 }
 
-/* Sidebar → same pattern, slightly softer, white text */
-[data-theme="polka"] .sidebar {
-    background:
-        radial-gradient(circle at center, rgba(245,201,208,0.30) 38%, transparent 39%) 0 0 / 34px 34px,
-        radial-gradient(circle at center, rgba(245,201,208,0.30) 38%, transparent 39%) 17px 17px / 34px 34px,
-        #7a9840;
-    border-right-color: #628030;
-    box-shadow: 4px 0 24px rgba(60,85,20,0.22);
-}
-[data-theme="polka"] .sidebar::before { display: none; }
-[data-theme="polka"] .sidebar::after  { display: none; }
-[data-theme="polka"] .navbar-brand        { color: #fff; }
-[data-theme="polka"] .navbar-brand::after { opacity: 0; }
-[data-theme="polka"] .navbar-menu a {
-    color: #fff;
-    font-weight: 800;
-    background: rgba(255,255,255,0.22);
-    border-color: rgba(255,255,255,0.26);
-    text-shadow: 0 1px 4px rgba(0,0,0,0.25);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-}
-[data-theme="polka"] .navbar-menu a .nav-icon { background: rgba(255,255,255,0.22); }
-[data-theme="polka"] .navbar-menu a:hover {
-    color: #fff;
-    background: rgba(255,255,255,0.28);
-    border-color: rgba(255,255,255,0.34);
-    transform: none;
-}
-[data-theme="polka"] .navbar-menu a:hover .nav-icon { background: rgba(255,255,255,0.30); }
-[data-theme="polka"] .navbar-menu a.active {
-    color: #fff;
-    background: rgba(255,255,255,0.34);
-    border-color: rgba(255,255,255,0.40);
-    box-shadow: 0 4px 14px rgba(0,0,0,0.15);
-}
-[data-theme="polka"] .navbar-menu a.active .nav-icon { background: rgba(255,255,255,0.36); }
-[data-theme="polka"] .theme-picker-label { color: rgba(255,255,255,0.62); }
-[data-theme="polka"] .theme-dot.active   { border-color: rgba(255,255,255,0.9); box-shadow: 0 0 0 2px rgba(255,255,255,0.4); }
 
 /* ─── GARDEN (watercolor floral — pink · mint · gold · lavender) ─── */
 [data-theme="garden"] {
