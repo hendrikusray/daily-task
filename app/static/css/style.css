@@ -1099,14 +1099,15 @@ span.flatpickr-weekday { color: var(--lily) !important; font-weight: 800 !import
     .auth-container { max-width: 100%; padding: 32px 24px; }
 
     .app-shell { display: block; }
-    .app-main { padding-top: 14px; padding-bottom: 90px; }
+    .app-main { padding-top: 14px; padding-bottom: calc(90px + env(safe-area-inset-bottom, 0px)); }
 
     .top-actions { position: sticky; top: 8px; z-index: 30; margin-bottom: 12px; padding: 0 14px; }
     .logout-link { background: rgba(255,232,242,0.92); backdrop-filter: blur(10px); }
 
     /* Bottom tab bar */
     .sidebar {
-        position: fixed; right: 10px; bottom: 10px; left: 10px; top: auto;
+        position: fixed; right: 10px; left: 10px; top: auto;
+        bottom: calc(10px + env(safe-area-inset-bottom, 0px));
         z-index: 40; display: block; width: auto; height: auto;
         padding: 8px 10px; overflow: visible;
         border: 1.5px solid var(--line); border-radius: 22px;
@@ -2037,29 +2038,54 @@ body[data-theme="polka"].auth-page::after {
     --shadow-card: 0 2px  14px rgba(58,92,216,0.07);
 }
 
-/* Form heading: cobalt bold dengan pattern, seperti tracker-header */
+/* Form heading: cobalt with pink/green accents */
 [data-theme="cobalt"] .tracker-form-container {
     overflow: hidden;
 }
 [data-theme="cobalt"] .tracker-form-container .form-heading {
     margin: -32px -32px 24px;
     padding: 28px 32px 20px;
-    background: linear-gradient(135deg, #3a5cd8 0%, #2a4cc8 100%);
-    border-bottom: 1.5px solid #2845b8;
+    background:
+        radial-gradient(ellipse 360px 170px at 92% 8%, rgba(232,79,160,0.46) 0%, transparent 72%),
+        radial-gradient(ellipse 280px 140px at 66% 112%, rgba(42,168,86,0.30) 0%, transparent 74%),
+        radial-gradient(ellipse 260px 150px at 10% 6%, rgba(255,255,255,0.15) 0%, transparent 70%),
+        linear-gradient(135deg, #2542b8 0%, #4165e5 52%, #2b42a8 100%);
+    border-bottom: 1.5px solid rgba(40,69,184,0.78);
     position: relative; z-index: 1;
     overflow: hidden;
 }
 [data-theme="cobalt"] .tracker-form-container .form-heading::before {
     content: "";
     position: absolute; inset: 0;
-    background: url("../images/cobalt-pattern.svg") repeat / 160px 160px;
-    background-position: 10px -5px;
-    opacity: 0.18;
+    background: url("../images/cobalt-pattern.svg") repeat / 118px 118px;
+    background-position: -16px -20px;
+    filter: saturate(1.45) contrast(1.08);
+    mix-blend-mode: screen;
+    opacity: 0.48;
     pointer-events: none;
 }
-[data-theme="cobalt"] .tracker-form-container .form-heading .eyebrow { color: rgba(255,255,255,0.72); }
-[data-theme="cobalt"] .tracker-form-container .form-heading h2 { color: #fff; position: relative; z-index: 1; }
-[data-theme="cobalt"] .tracker-form-container .form-heading .eyebrow { position: relative; z-index: 1; }
+[data-theme="cobalt"] .tracker-form-container .form-heading::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(circle at 82% 28%, rgba(255,224,242,0.44) 0 13px, transparent 14px),
+        radial-gradient(circle at 92% 64%, rgba(42,168,86,0.28) 0 10px, transparent 11px),
+        radial-gradient(circle at 22% 76%, rgba(255,224,242,0.22) 0 11px, transparent 12px),
+        linear-gradient(90deg, rgba(26,34,96,0.28) 0%, rgba(26,34,96,0.03) 48%, rgba(255,255,255,0.10) 100%);
+    pointer-events: none;
+}
+[data-theme="cobalt"] .tracker-form-container .form-heading .eyebrow {
+    position: relative;
+    z-index: 1;
+    color: #ffe0f2;
+}
+[data-theme="cobalt"] .tracker-form-container .form-heading h2 {
+    position: relative;
+    z-index: 1;
+    color: #fff;
+    text-shadow: 0 2px 10px rgba(18,32,118,0.24);
+}
 @media (max-width: 480px) {
     [data-theme="cobalt"] .tracker-form-container .form-heading {
         margin: -18px -18px 22px;
@@ -2293,4 +2319,87 @@ body[data-theme="polka"].auth-page::after {
 [data-theme="cobalt"] .page-loader::before {
     background: url("../images/cobalt-pattern.svg") repeat center / 200px 200px;
     opacity: 0.11;
+}
+
+/* ============================================================
+   MOBILE — RESPONSIVE THEMING & UX POLISH
+   ============================================================ */
+
+/* --- Touch tap feedback on bottom nav --- */
+@media (max-width: 768px) {
+    .navbar-menu a { transition: transform 0.12s ease, background 0.15s; }
+    .navbar-menu a:active { transform: scale(0.90) !important; }
+
+    /* --- Themed bottom nav pill --- */
+    [data-theme="polka"] .sidebar {
+        background:
+            radial-gradient(circle at center, rgba(218,72,138,0.13) 36%, transparent 37%) 0 0 / 16px 16px,
+            radial-gradient(circle at center, rgba(218,72,138,0.13) 36%, transparent 37%) 8px 8px / 16px 16px,
+            rgba(248,244,234,0.97);
+        border-color: rgba(204,220,170,0.92);
+        box-shadow: 0 -4px 20px rgba(80,112,32,0.13), 0 8px 20px rgba(80,112,32,0.08);
+    }
+    [data-theme="garden"] .sidebar {
+        background: rgba(255,252,248,0.97);
+        border-color: rgba(240,208,192,0.92);
+        box-shadow: 0 -4px 20px rgba(212,86,138,0.10), 0 8px 20px rgba(212,86,138,0.06);
+    }
+    [data-theme="floral"] .sidebar {
+        background: rgba(255,253,248,0.97);
+        border-color: rgba(240,216,192,0.92);
+        box-shadow: 0 -4px 20px rgba(216,74,140,0.10), 0 8px 20px rgba(216,74,140,0.06);
+    }
+    [data-theme="cobalt"] .sidebar {
+        background: rgba(237,241,255,0.97);
+        border-color: rgba(184,196,238,0.92);
+        box-shadow: 0 -4px 20px rgba(58,92,216,0.12), 0 8px 20px rgba(58,92,216,0.07);
+    }
+
+    /* --- Themed logout link --- */
+    [data-theme="polka"]  .logout-link { background: rgba(248,244,234,0.95); }
+    [data-theme="garden"] .logout-link { background: rgba(255,248,242,0.95); }
+    [data-theme="floral"] .logout-link { background: rgba(255,250,244,0.95); }
+    [data-theme="cobalt"] .logout-link { background: rgba(237,241,255,0.95); }
+
+    /* --- Tracker-header mobile: dark themes need white text enforced --- */
+    [data-theme="polka"] .tracker-header .header-actions .btn,
+    [data-theme="cobalt"] .tracker-header .header-actions .btn {
+        min-height: 40px; padding: 9px 16px;
+    }
+
+    /* --- Table cards: border follows theme accent for normal rows --- */
+    [data-theme="polka"]  .tracker-table tr { border-left-color: var(--line); }
+    [data-theme="garden"] .tracker-table tr { border-left-color: var(--line); }
+    [data-theme="floral"] .tracker-table tr { border-left-color: var(--line); }
+    [data-theme="cobalt"] .tracker-table tr { border-left-color: var(--line); }
+    /* Keep deadline states visible across all themes */
+    [data-theme="polka"]  .tracker-table tr.deadline-due-soon,
+    [data-theme="garden"] .tracker-table tr.deadline-due-soon,
+    [data-theme="floral"] .tracker-table tr.deadline-due-soon,
+    [data-theme="cobalt"] .tracker-table tr.deadline-due-soon { border-left-color: var(--warning); }
+    [data-theme="polka"]  .tracker-table tr.deadline-overdue,
+    [data-theme="garden"] .tracker-table tr.deadline-overdue,
+    [data-theme="floral"] .tracker-table tr.deadline-overdue,
+    [data-theme="cobalt"] .tracker-table tr.deadline-overdue  { border-left-color: var(--danger); }
+}
+
+/* --- Mobile stat card spacing --- */
+@media (max-width: 480px) {
+    .stat-card { padding: 16px 18px; }
+    .stat-card-success { grid-column: span 1; }
+
+    /* Floral form heading mobile */
+    [data-theme="floral"] .tracker-form-container .form-heading {
+        margin: -18px -18px 22px;
+        padding: 22px 18px 18px;
+    }
+    /* Cobalt form heading mobile — dark text override not needed, white is fine */
+}
+
+/* --- Mobile: tracker-header padding for dark themes --- */
+@media (max-width: 840px) {
+    [data-theme="polka"]  .tracker-header,
+    [data-theme="cobalt"] .tracker-header {
+        gap: 12px;
+    }
 }
