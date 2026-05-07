@@ -661,7 +661,7 @@ tr.deadline-done     .deadline-cell { color: var(--sage); }
 .truncate-cell {
     min-width: 160px; max-width: 220px;
     color: var(--muted); font-size: 13px; line-height: 1.45;
-    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+    max-height: 2.9em;
     overflow: hidden;
 }
 
@@ -939,7 +939,7 @@ span.flatpickr-weekday { color: var(--lily) !important; font-weight: 800 !import
     .tracker-table .strong-cell::before { margin-bottom: -2px; }
     .tracker-table td[data-label="Deadline"] { order: -2; }
     .tracker-table td[data-label="Status"]   { order: -1; }
-    .truncate-cell { min-width: 0; max-width: none; -webkit-line-clamp: 3; }
+    .truncate-cell { min-width: 0; max-width: none; max-height: 4.35em; }
     .deadline-cell { white-space: normal; }
     .table-actions { display: flex; gap: 8px; width: 100%; min-width: 0; }
     .table-actions .btn { flex: 1; }
