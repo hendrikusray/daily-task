@@ -118,9 +118,17 @@ class Konten(db.Model):
         days_left = (self.deadline - today).days
         if days_left < 0:
             return 'overdue'
+        if days_left <= 3:
+            return 'due-critical'
         if days_left <= 5:
             return 'due-soon'
         return 'normal'
+
+    @property
+    def days_left(self):
+        if not self.deadline:
+            return None
+        return (self.deadline - date.today()).days
 
     @property
     def deadline_text(self):
@@ -196,7 +204,10 @@ def tracker_options():
 
 
 def ordered_tracker_query():
+    from sqlalchemy import case
+    done_last = case((Konten.status == 'DONE', 1), else_=0)
     return Konten.query.filter_by(user_id=current_user.id).order_by(
+        done_last,
         Konten.deadline.is_(None),
         Konten.deadline.asc(),
         Konten.created_at.desc()

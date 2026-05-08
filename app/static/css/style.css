@@ -802,24 +802,31 @@ body.modal-open { overflow: hidden; }
 .tracker-table tbody tr:hover td { background: rgba(255,232,242,0.5) !important; }
 
 /* Deadline row states — left accent */
-.tracker-table tr.deadline-due-soon  { border-left: 3px solid var(--warning); }
-.tracker-table tr.deadline-overdue   { border-left: 3px solid var(--danger); }
-.tracker-table tr.deadline-done      { border-left: 3px solid var(--success); }
+.tracker-table tr.deadline-due-soon     { border-left: 3px solid var(--warning); }
+.tracker-table tr.deadline-due-critical { border-left: 3px solid var(--danger); }
+.tracker-table tr.deadline-overdue      { border-left: 3px solid var(--danger); }
+.tracker-table tr.deadline-done         { border-left: 3px solid var(--success); }
 
-.tracker-table tr.deadline-due-soon  td { background: #FFFBF0; }
-.tracker-table tr.deadline-overdue   td { background: var(--danger-pale); }
-.tracker-table tr.deadline-done      td { background: var(--success-pale); opacity: 0.92; }
+.tracker-table tr.deadline-due-soon     td { background: #FFFBF0; }
+.tracker-table tr.deadline-due-critical td { background: var(--danger-pale); }
+.tracker-table tr.deadline-overdue      td { background: var(--danger-pale); }
+.tracker-table tr.deadline-done         td { background: var(--success-pale); opacity: 0.92; }
 
-.tracker-table tr.deadline-due-soon:hover  td { background: #FFF3D5 !important; }
-.tracker-table tr.deadline-overdue:hover   td { background: #FEE4E4 !important; }
-.tracker-table tr.deadline-done:hover      td { background: #D8F0D2 !important; }
+.tracker-table tr.deadline-due-soon:hover     td { background: #FFF3D5 !important; }
+.tracker-table tr.deadline-due-critical:hover td { background: #FEE4E4 !important; }
+.tracker-table tr.deadline-overdue:hover      td { background: #FEE4E4 !important; }
+.tracker-table tr.deadline-done:hover         td { background: #D8F0D2 !important; }
 
 .deadline-cell { font-weight: 800; white-space: nowrap; font-size: 13px; }
-tr.deadline-due-soon .deadline-cell { color: #7A5010; }
-tr.deadline-due-soon .deadline-cell::before { content: "⏰ "; }
-tr.deadline-overdue  .deadline-cell { color: #8A1A1A; }
-tr.deadline-overdue  .deadline-cell::before { content: "🚨 "; }
-tr.deadline-done     .deadline-cell { color: var(--sage); }
+tr.deadline-due-soon     .deadline-cell { color: #7A5010; }
+tr.deadline-due-soon     .deadline-cell::before { content: "⏰ "; }
+tr.deadline-due-critical .deadline-cell { color: #8A1A1A; }
+tr.deadline-due-critical .deadline-cell::before { content: "🚨 "; }
+tr.deadline-overdue      .deadline-cell { color: #8A1A1A; }
+tr.deadline-overdue      .deadline-cell::before { content: "🚨 "; }
+tr.deadline-done         .deadline-cell { color: var(--sage); }
+
+.deadline-soon-tag--due-critical { background: var(--danger) !important; color: #fff !important; }
 
 .strong-cell   { min-width: 140px; font-weight: 700; }
 .muted-cell    { font-size: 13px; color: var(--muted); max-width: 200px; }
@@ -1145,8 +1152,9 @@ span.flatpickr-weekday { color: var(--lily) !important; font-weight: 800 !import
         background: var(--surface); border: 1.5px solid var(--line-soft);
         border-radius: var(--r); box-shadow: var(--shadow-card); border-left-width: 4px;
     }
-    .tracker-table tr.deadline-due-soon { border-color: var(--warning); box-shadow: 0 6px 20px rgba(192,122,48,0.12); }
-    .tracker-table tr.deadline-overdue  { border-color: var(--danger);  box-shadow: 0 6px 20px rgba(190,40,40,0.12); }
+    .tracker-table tr.deadline-due-soon     { border-color: var(--warning); box-shadow: 0 6px 20px rgba(192,122,48,0.12); }
+    .tracker-table tr.deadline-due-critical { border-color: var(--danger);  box-shadow: 0 6px 20px rgba(190,40,40,0.12); }
+    .tracker-table tr.deadline-overdue      { border-color: var(--danger);  box-shadow: 0 6px 20px rgba(190,40,40,0.12); }
     .tracker-table tr.deadline-done     { border-color: var(--success); }
     .tracker-table th, .tracker-table td { max-width: none; padding: 10px 14px; border: none; border-bottom: 1px solid var(--line-soft); background: transparent !important; }
     .tracker-table td { display: grid; grid-template-columns: minmax(110px, 36%) minmax(0, 1fr); gap: 10px; align-items: start; word-break: break-word; }
@@ -2372,6 +2380,10 @@ body[data-theme="polka"].auth-page::after {
     [data-theme="garden"] .tracker-table tr.deadline-due-soon,
     [data-theme="floral"] .tracker-table tr.deadline-due-soon,
     [data-theme="cobalt"] .tracker-table tr.deadline-due-soon { border-left-color: var(--warning); }
+    [data-theme="polka"]  .tracker-table tr.deadline-due-critical,
+    [data-theme="garden"] .tracker-table tr.deadline-due-critical,
+    [data-theme="floral"] .tracker-table tr.deadline-due-critical,
+    [data-theme="cobalt"] .tracker-table tr.deadline-due-critical { border-left-color: var(--danger); }
     [data-theme="polka"]  .tracker-table tr.deadline-overdue,
     [data-theme="garden"] .tracker-table tr.deadline-overdue,
     [data-theme="floral"] .tracker-table tr.deadline-overdue,
@@ -2624,6 +2636,10 @@ body[data-theme="polka"].auth-page::after {
     .tracker-table tr.deadline-due-soon {
         border-color: var(--line-soft);
         border-left-color: var(--warning);
+    }
+    .tracker-table tr.deadline-due-critical {
+        border-color: var(--line-soft);
+        border-left-color: var(--danger);
     }
 
     .tracker-table tr.deadline-overdue {

@@ -13,7 +13,7 @@
             <div>
                 <span class="eyebrow">✨ Campaign Tracker</span>
                 <h1>Halo, {{ display_name }} 💕</h1>
-                <p>Semua campaign diurutkan dari deadline terdekat.</p>
+                <p>"you got this!" 💪</p>
             </div>
         </div>
         <div class="header-actions">
@@ -56,10 +56,10 @@
                 <thead>
                     <tr>
                         <th>Brand</th>
+                        <th>Deadline</th>
+                        <th>Status</th>
                         <th>SOW</th>
                         <th>Platform</th>
-                        <th>Status</th>
-                        <th>Deadline</th>
                         <th>Aksi</th>
                     </tr>
                 </thead>
@@ -101,17 +101,17 @@
                                 {% endif %}
                             </div>
                         </td>
-                        <td data-label="SOW" class="muted-cell">{{ (k.sow or '-')|truncate(48, True, '…') }}</td>
-                        <td data-label="Platform">
-                            <span class="data-pill platform-pill">{{ k.platform or '-' }}</span>
+                        <td data-label="Deadline" class="deadline-cell">
+                            {{ k.deadline_text }}
+                            {% if k.deadline_state in ('due-soon', 'due-critical') %}<span class="deadline-soon-tag deadline-soon-tag--{{ k.deadline_state }}">H-{{ k.days_left }}</span>{% endif %}
+                            {% if k.deadline_state == 'overdue' %}<span class="deadline-overdue-tag">Overdue</span>{% endif %}
                         </td>
                         <td data-label="Status">
                             <span class="status-badge status-{{ status_class }}">{{ k.status or '-' }}</span>
                         </td>
-                        <td data-label="Deadline" class="deadline-cell">
-                            {{ k.deadline_text }}
-                            {% if k.deadline_state == 'due-soon' %}<span class="deadline-soon-tag">H-5</span>{% endif %}
-                            {% if k.deadline_state == 'overdue' %}<span class="deadline-overdue-tag">Overdue</span>{% endif %}
+                        <td data-label="SOW" class="muted-cell">{{ (k.sow or '-')|truncate(48, True, '…') }}</td>
+                        <td data-label="Platform">
+                            <span class="data-pill platform-pill">{{ k.platform or '-' }}</span>
                         </td>
                         <td data-label="Aksi" onclick="event.stopPropagation()">
                             <div class="table-actions">
