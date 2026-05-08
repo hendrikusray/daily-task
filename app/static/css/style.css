@@ -747,6 +747,7 @@ body.modal-open { overflow: hidden; }
 
 .header-title h1 { margin: 3px 0; color: var(--ink); font-size: 24px; font-weight: 900; line-height: 1.2; }
 .header-title p  { color: var(--muted); font-size: 13px; line-height: 1.5; }
+.header-quote    { font-size: 16px !important; font-weight: 700; font-style: italic; color: var(--ink) !important; opacity: 0.75; }
 .header-actions  { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 10px; position: relative; z-index: 1; }
 
 /* ================================================================
@@ -825,8 +826,6 @@ tr.deadline-due-critical .deadline-cell::before { content: "🚨 "; }
 tr.deadline-overdue      .deadline-cell { color: #8A1A1A; }
 tr.deadline-overdue      .deadline-cell::before { content: "🚨 "; }
 tr.deadline-done         .deadline-cell { color: var(--sage); }
-
-.deadline-soon-tag--due-critical { background: var(--danger) !important; color: #fff !important; }
 
 .strong-cell   { min-width: 140px; font-weight: 700; }
 .muted-cell    { font-size: 13px; color: var(--muted); max-width: 200px; }
@@ -1202,10 +1201,12 @@ span.flatpickr-weekday { color: var(--lily) !important; font-weight: 800 !import
 .deadline-soon-tag {
     display: inline-block; margin-left: 6px;
     padding: 1px 6px; border-radius: 20px;
-    background: var(--warning-pale); color: var(--warning);
+    background: var(--line-soft); color: var(--muted);
     font-size: 10px; font-weight: 800; letter-spacing: .03em;
     vertical-align: middle;
 }
+.deadline-soon-tag--due-soon     { background: var(--warning-pale) !important; color: var(--warning) !important; }
+.deadline-soon-tag--due-critical { background: var(--danger) !important; color: #fff !important; }
 .deadline-overdue-tag {
     display: inline-block; margin-left: 6px;
     padding: 1px 6px; border-radius: 20px;

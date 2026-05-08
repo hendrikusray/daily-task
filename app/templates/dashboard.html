@@ -13,7 +13,7 @@
             <div>
                 <span class="eyebrow">✨ Campaign Tracker</span>
                 <h1>Halo, {{ display_name }} 💕</h1>
-                <p>"you got this!" 💪</p>
+                <p class="header-quote">"you got this!" 💪</p>
             </div>
         </div>
         <div class="header-actions">
@@ -103,7 +103,7 @@
                         </td>
                         <td data-label="Deadline" class="deadline-cell">
                             {{ k.deadline_text }}
-                            {% if k.deadline_state in ('due-soon', 'due-critical') %}<span class="deadline-soon-tag deadline-soon-tag--{{ k.deadline_state }}">H-{{ k.days_left }}</span>{% endif %}
+                            {% if k.deadline_state in ('normal', 'due-soon', 'due-critical') %}<span class="deadline-soon-tag deadline-soon-tag--{{ k.deadline_state }}">H-{{ k.days_left }}</span>{% endif %}
                             {% if k.deadline_state == 'overdue' %}<span class="deadline-overdue-tag">Overdue</span>{% endif %}
                         </td>
                         <td data-label="Status">
