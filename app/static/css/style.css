@@ -819,6 +819,7 @@ body.modal-open { overflow: hidden; }
 .tracker-table tr.deadline-done:hover         td { background: #D8F0D2 !important; }
 
 .deadline-cell { font-weight: 800; white-space: nowrap; font-size: 13px; }
+tr.deadline-normal       .deadline-cell::before { content: "📅 "; }
 tr.deadline-due-soon     .deadline-cell { color: #7A5010; }
 tr.deadline-due-soon     .deadline-cell::before { content: "⏰ "; }
 tr.deadline-due-critical .deadline-cell { color: #8A1A1A; }
