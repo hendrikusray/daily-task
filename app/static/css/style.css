@@ -3065,7 +3065,6 @@ body[data-theme="polka"].auth-page::after {
 
 /* === MONTHLY INCOME TABLE === */
 .monthly-income-section { margin-bottom: 8px; }
-.monthly-table { min-width: 520px; }
 .monthly-table td, .monthly-table th { white-space: nowrap; }
 .monthly-total { font-weight: 800; color: var(--sage-dark); font-size: 14px; }
 .monthly-row-current td { background: var(--lily-pale) !important; }
@@ -3148,12 +3147,38 @@ body[data-theme="polka"].auth-page::after {
 }
 
 @media (max-width: 720px) {
+    /* Total card full width, other two side by side */
     .income-stat-grid {
-        grid-template-columns: 1fr;
-        padding: 14px 16px;
+        grid-template-columns: 1fr 1fr;
+        padding: 14px 14px 10px;
         gap: 10px;
     }
-    .income-stat-value { font-size: 24px; }
+    .income-stat-card:first-child {
+        grid-column: span 2;
+    }
+    /* Compact card layout on mobile: horizontal row */
+    .income-stat-card {
+        flex-direction: row;
+        align-items: center;
+        gap: 10px;
+        padding: 14px 16px;
+    }
+    .income-stat-card:first-child {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+        padding: 16px 18px;
+    }
+    .income-stat-icon { font-size: 18px; flex-shrink: 0; }
+    .income-stat-card:first-child .income-stat-icon { font-size: 22px; }
+    .income-stat-label { font-size: 10px; }
+    .income-stat-value { font-size: 20px; }
+    .income-stat-card:first-child .income-stat-value { font-size: 26px; }
+    /* For the two smaller cards, stack label+value together */
+    .income-stat-card:not(:first-child) .income-stat-label,
+    .income-stat-card:not(:first-child) .income-stat-value {
+        display: block;
+    }
 }
 
 .income-filter-bar {
@@ -3208,12 +3233,23 @@ body[data-theme="polka"].auth-page::after {
 
 @media (max-width: 720px) {
     .income-filter-bar {
-        padding: 12px 0;
+        padding: 12px 14px;
+        gap: 8px;
     }
-
     .income-filter-field {
-        flex: 1 1 140px;
+        flex: 1 1 0;
         min-width: 0;
+    }
+    .income-filter-field select {
+        min-height: 36px;
+        font-size: 12px;
+        padding: 7px 28px 7px 10px;
+    }
+    .income-reset-btn {
+        align-self: flex-end;
+        min-height: 36px;
+        padding: 7px 14px;
+        font-size: 12px;
     }
 }
 
