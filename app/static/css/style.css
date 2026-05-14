@@ -65,6 +65,7 @@ html { min-height: 100%; scroll-behavior: smooth; }
 
 body {
     min-height: 100vh;
+    overflow-x: hidden;
     color: var(--ink);
     font-family: 'Nunito', 'Segoe UI', system-ui, sans-serif;
     font-size: 15px;
