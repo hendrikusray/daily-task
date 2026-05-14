@@ -3065,58 +3065,49 @@ body[data-theme="polka"].auth-page::after {
 
 /* === MONTHLY INCOME TABLE === */
 .monthly-income-section { margin-bottom: 8px; }
-.monthly-table td, .monthly-table th { white-space: nowrap; }
+.monthly-table-wrap { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.monthly-table {
+    width: 100%;
+    border-collapse: collapse;
+    border-spacing: 0;
+    background: transparent;
+    font-size: 14px;
+}
+.monthly-table th {
+    padding: 10px 18px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--muted);
+    border-bottom: 1.5px solid var(--line-soft);
+    white-space: nowrap;
+}
+.monthly-table td {
+    padding: 13px 18px;
+    border-bottom: 1px solid var(--line-soft);
+    vertical-align: middle;
+}
+.monthly-table td:last-child, .monthly-table th:last-child { text-align: right; }
 .monthly-total { font-weight: 800; color: var(--sage-dark); font-size: 14px; }
-.monthly-row-current td { background: var(--lily-pale) !important; }
-.monthly-row-current .monthly-total { color: var(--lily-dark); font-size: 15px; }
+.monthly-row-current td { background: var(--lily-pale); }
+.monthly-row-current .monthly-total { color: var(--lily-dark); }
 .income-total-row td {
-    border-top: 2px solid var(--line) !important;
-    background: var(--surface-soft) !important;
-    font-weight: 800; font-size: 14px;
+    border-top: 2px solid var(--line);
+    border-bottom: none;
+    background: var(--surface-soft);
+    font-weight: 800;
+    font-size: 14px;
 }
 .income-total-row .monthly-total { font-size: 15px; color: var(--lily-dark); }
 .income-empty-row td {
-    padding: 24px !important;
-    color: var(--muted) !important;
-    background: var(--surface) !important;
-    text-align: center !important;
+    padding: 24px 18px;
+    color: var(--muted);
+    text-align: center;
     font-weight: 800;
 }
 
-@media (max-width: 840px) {
-    /* Keep monthly-table as a real table, don't inherit dashboard card style */
-    .monthly-table,
-    .monthly-table tbody,
-    .monthly-table thead,
-    .monthly-table tr,
-    .monthly-table td,
-    .monthly-table th {
-        display: revert;
-        width: auto;
-    }
-    .monthly-table {
-        width: 100%;
-        border-collapse: collapse;
-        border-spacing: 0;
-        background: transparent;
-        box-shadow: none;
-        border: none;
-    }
-    .monthly-table thead { display: table-header-group; }
-    .monthly-table tr { display: table-row; background: transparent; border: none; box-shadow: none; border-radius: 0; border-left-width: 0; }
-    .monthly-table td, .monthly-table th {
-        display: table-cell;
-        padding: 14px 16px;
-        border: none;
-        border-bottom: 1px solid var(--line-soft);
-        white-space: normal;
-        word-break: break-word;
-        grid-template-columns: none;
-    }
-    .monthly-table td::before { display: none; }
-    .monthly-table th { font-size: 11px; padding: 10px 16px; }
-    .monthly-table .monthly-total { white-space: nowrap; }
-}
 
 /* income header meta */
 .income-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
