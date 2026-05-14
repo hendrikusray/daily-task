@@ -3335,9 +3335,14 @@ body[data-theme="polka"].auth-page::after {
 /* === INCOME CHART === */
 .income-chart-wrap {
     padding: 20px 24px 24px;
+    max-height: 320px;
+}
+.income-chart-wrap canvas {
+    max-height: 280px;
 }
 @media (max-width: 600px) {
-    .income-chart-wrap { padding: 14px 10px 18px; }
+    .income-chart-wrap { padding: 14px 10px 18px; max-height: none; }
+    .income-chart-wrap canvas { max-height: 220px; }
 }
 
 /* === PENGELUARAN PAGE === */
