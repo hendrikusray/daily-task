@@ -135,7 +135,15 @@
 (function() {
     var rows = {{ monthly_income | tojson }};
     rows = rows.slice().reverse();
-    var labels = rows.map(function(r) { return r.label; });
+    var isMobile = window.innerWidth < 600;
+    var labels = rows.map(function(r) {
+        if (isMobile) {
+            // "November 2025" → "Nov '25"
+            var parts = r.label.split(' ');
+            return parts[0].substring(0, 3) + " '" + parts[1].slice(-2);
+        }
+        return r.label;
+    });
     var values = rows.map(function(r) { return r.total; });
 
     var ctx = document.getElementById('incomeChart').getContext('2d');
@@ -180,7 +188,11 @@
                     grid: { color: 'rgba(0,0,0,0.06)' }
                 },
                 x: {
-                    ticks: { font: { family: 'Nunito', size: 12 } },
+                    ticks: {
+                        font: { family: 'Nunito', size: isMobile ? 10 : 12 },
+                        maxRotation: isMobile ? 30 : 0,
+                        minRotation: isMobile ? 30 : 0,
+                    },
                     grid: { display: false }
                 }
             }

@@ -3083,6 +3083,41 @@ body[data-theme="polka"].auth-page::after {
     font-weight: 800;
 }
 
+@media (max-width: 840px) {
+    /* Keep monthly-table as a real table, don't inherit dashboard card style */
+    .monthly-table,
+    .monthly-table tbody,
+    .monthly-table thead,
+    .monthly-table tr,
+    .monthly-table td,
+    .monthly-table th {
+        display: revert;
+        width: auto;
+    }
+    .monthly-table {
+        width: 100%;
+        border-collapse: collapse;
+        border-spacing: 0;
+        background: transparent;
+        box-shadow: none;
+        border: none;
+    }
+    .monthly-table thead { display: table-header-group; }
+    .monthly-table tr { display: table-row; background: transparent; border: none; box-shadow: none; border-radius: 0; border-left-width: 0; }
+    .monthly-table td, .monthly-table th {
+        display: table-cell;
+        padding: 14px 16px;
+        border: none;
+        border-bottom: 1px solid var(--line-soft);
+        white-space: normal;
+        word-break: break-word;
+        grid-template-columns: none;
+    }
+    .monthly-table td::before { display: none; }
+    .monthly-table th { font-size: 11px; padding: 10px 16px; }
+    .monthly-table .monthly-total { white-space: nowrap; }
+}
+
 /* income header meta */
 .income-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .income-status-badge {
@@ -3147,38 +3182,26 @@ body[data-theme="polka"].auth-page::after {
 }
 
 @media (max-width: 720px) {
-    /* Total card full width, other two side by side */
     .income-stat-grid {
         grid-template-columns: 1fr 1fr;
         padding: 14px 14px 10px;
         gap: 10px;
     }
+    /* Total card spans full width */
     .income-stat-card:first-child {
         grid-column: span 2;
-    }
-    /* Compact card layout on mobile: horizontal row */
-    .income-stat-card {
-        flex-direction: row;
-        align-items: center;
-        gap: 10px;
-        padding: 14px 16px;
-    }
-    .income-stat-card:first-child {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 4px;
         padding: 16px 18px;
+        gap: 4px;
     }
-    .income-stat-icon { font-size: 18px; flex-shrink: 0; }
-    .income-stat-card:first-child .income-stat-icon { font-size: 22px; }
-    .income-stat-label { font-size: 10px; }
-    .income-stat-value { font-size: 20px; }
+    /* Two smaller cards stay vertical, compact */
+    .income-stat-card:not(:first-child) {
+        padding: 14px 14px;
+        gap: 4px;
+    }
+    .income-stat-icon { font-size: 18px; }
+    .income-stat-label { font-size: 10px; letter-spacing: 0.03em; }
+    .income-stat-value { font-size: 18px; }
     .income-stat-card:first-child .income-stat-value { font-size: 26px; }
-    /* For the two smaller cards, stack label+value together */
-    .income-stat-card:not(:first-child) .income-stat-label,
-    .income-stat-card:not(:first-child) .income-stat-value {
-        display: block;
-    }
 }
 
 .income-filter-bar {
