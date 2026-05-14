@@ -60,9 +60,17 @@ STATUS_OPTIONS = [
     'Waiting client brief',
     'Waiting product arrival',
     "Waiting client's payment",
-    'DONE'
+    'DONE',
+    'Transfer'
 ]
+FINISHED_STATUS_OPTIONS = ['DONE', 'Transfer']
+FINISHED_STATUS_VALUES = {status.upper() for status in FINISHED_STATUS_OPTIONS}
+INCOME_STATUS = 'Transfer'
 EXPENSE_CATEGORY_OPTIONS = ['Editor', 'Asisten', 'Transport', 'Peralatan', 'Software', 'Lain-lain']
+MONTH_LABELS_ID = [
+    'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+    'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+]
 
 # ============ DATABASE MODELS ============
 class User(UserMixin, db.Model):
@@ -113,7 +121,7 @@ class Konten(db.Model):
             return 'no-deadline'
 
         status = (self.status or '').upper()
-        if status == 'DONE':
+        if status in FINISHED_STATUS_VALUES:
             return 'done'
 
         today = date.today()
@@ -170,11 +178,29 @@ def parse_fee(fee_str):
     return int(digits) if digits else 0
 
 
+def is_finished_status(status):
+    return (status or '').upper() in FINISHED_STATUS_VALUES
+
+
+def format_month_label(month_key):
+    year, month = month_key.split('-')
+    return f'{MONTH_LABELS_ID[int(month) - 1]} {year}'
+
+
 @app.template_filter('idr')
 def idr_filter(amount):
     if not amount:
         return 'Rp 0'
     return 'Rp ' + f'{int(amount):,}'.replace(',', '.')
+
+
+@app.template_filter('status_label')
+def status_label_filter(status):
+    if not status:
+        return ''
+    if str(status).upper() == 'DONE':
+        return 'Done'
+    return status
 
 
 def form_text(name):
@@ -233,7 +259,7 @@ def tracker_options():
 
 def ordered_tracker_query():
     from sqlalchemy import case
-    done_last = case((Konten.status == 'DONE', 1), else_=0)
+    done_last = case((Konten.status.in_(FINISHED_STATUS_OPTIONS), 1), else_=0)
     return Konten.query.filter_by(user_id=current_user.id).order_by(
         done_last,
         Konten.deadline.is_(None),
@@ -248,8 +274,44 @@ def due_soon_query():
         Konten.user_id == current_user.id,
         Konten.deadline >= today,
         Konten.deadline <= today + timedelta(days=5),
-        Konten.status != 'DONE'
+        ~Konten.status.in_(FINISHED_STATUS_OPTIONS)
     )
+
+
+def build_income_context(user_id):
+    from collections import defaultdict
+    monthly_buckets = defaultdict(lambda: {'count': 0, 'total': 0})
+    transfer_items = Konten.query.filter_by(user_id=user_id, status=INCOME_STATUS).all()
+
+    for k in transfer_items:
+        ref = k.deadline or (k.created_at.date() if k.created_at else date.today())
+        key = ref.strftime('%Y-%m')
+        monthly_buckets[key]['count'] += 1
+        monthly_buckets[key]['total'] += parse_fee(k.fee)
+
+    sorted_keys = sorted(monthly_buckets.keys(), reverse=True)
+    monthly_income = [
+        {
+            'key': m,
+            'year': m[:4],
+            'month': m[5:7],
+            'label': format_month_label(m),
+            'count': monthly_buckets[m]['count'],
+            'total': monthly_buckets[m]['total'],
+        }
+        for m in sorted_keys
+    ]
+
+    return {
+        'monthly_income': monthly_income,
+        'total_income': sum(monthly_buckets[m]['total'] for m in monthly_buckets),
+        'income_total_campaigns': sum(monthly_buckets[m]['count'] for m in monthly_buckets),
+        'income_years': sorted({m[:4] for m in monthly_buckets}, reverse=True),
+        'income_months': [
+            {'value': month, 'label': MONTH_LABELS_ID[int(month) - 1]}
+            for month in sorted({m[5:7] for m in monthly_buckets})
+        ]
+    }
 
 
 def distinct_values(column):
@@ -453,43 +515,28 @@ def login():
 @app.route('/dashboard')
 @login_required
 def dashboard():
-    from collections import defaultdict
     page = request.args.get('page', 1, type=int)
     konten_list = ordered_tracker_query().paginate(page=page, per_page=25)
     total_konten = Konten.query.filter_by(user_id=current_user.id).count()
     due_soon_count = due_soon_query().count()
-    done_count = Konten.query.filter_by(user_id=current_user.id, status='DONE').count()
-
-    monthly_buckets = defaultdict(lambda: {'count': 0, 'total': 0})
-    paid_items = Konten.query.filter_by(user_id=current_user.id, payment='Paid').all()
-    for k in paid_items:
-        ref = k.deadline or (k.created_at.date() if k.created_at else date.today())
-        key = ref.strftime('%Y-%m')
-        monthly_buckets[key]['count'] += 1
-        monthly_buckets[key]['total'] += parse_fee(k.fee)
-    sorted_keys = sorted(monthly_buckets.keys(), reverse=True)
-    monthly_income = [
-        {
-            'key': m,
-            'label': datetime.strptime(m, '%Y-%m').strftime('%B %Y'),
-            'count': monthly_buckets[m]['count'],
-            'total': monthly_buckets[m]['total'],
-        }
-        for m in sorted_keys
-    ]
-    total_income = sum(monthly_buckets[m]['total'] for m in monthly_buckets)
-    income_years = sorted({m[:4] for m in monthly_buckets}, reverse=True)
+    done_count = Konten.query.filter(
+        Konten.user_id == current_user.id,
+        Konten.status.in_(FINISHED_STATUS_OPTIONS)
+    ).count()
 
     return render_template(
         'dashboard.html',
         konten_list=konten_list,
         total_konten=total_konten,
         due_soon_count=due_soon_count,
-        done_count=done_count,
-        monthly_income=monthly_income,
-        total_income=total_income,
-        income_years=income_years
+        done_count=done_count
     )
+
+
+@app.route('/pendapatan')
+@login_required
+def pendapatan():
+    return render_template('pendapatan.html', **build_income_context(current_user.id))
 
 
 @app.route('/konten/buat', methods=['GET', 'POST'])
@@ -582,7 +629,7 @@ def report():
         filters=filters,
         total_results=len(results),
         due_soon_count=sum(1 for item in results if item.deadline_state == 'due-soon'),
-        done_count=sum(1 for item in results if (item.status or '').upper() == 'DONE'),
+        done_count=sum(1 for item in results if is_finished_status(item.status)),
         **report_options
     )
 

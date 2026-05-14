@@ -78,11 +78,12 @@
 
             <!-- Platform -->
             <div class="form-group-full">
-                <label>📱 Platform <span class="field-hint">Bisa pilih lebih dari 1</span></label>
+                <label>📱 Platform</label>
                 <div class="multi-select" data-multi-select data-placeholder="Semua Platform">
                     <button type="button" class="multi-select-trigger" data-multi-select-trigger aria-expanded="false">
                         <span class="multi-select-summary" data-multi-select-label>Semua Platform</span>
-                        <span class="multi-select-caret">⌄</span>
+                        <span class="multi-select-count" data-multi-select-count hidden>0</span>
+                        <span class="multi-select-caret" aria-hidden="true">⌄</span>
                     </button>
                     <div class="multi-select-menu" data-multi-select-menu>
                     {% for option in platform_options %}
@@ -102,7 +103,7 @@
                 <select id="status" name="status">
                     <option value="">Semua Status</option>
                     {% for option in status_options %}
-                        <option value="{{ option }}" {% if filters.status == option %}selected{% endif %}>{{ option }}</option>
+                        <option value="{{ option }}" {% if filters.status == option %}selected{% endif %}>{{ option|status_label }}</option>
                     {% endfor %}
                 </select>
             </div>
@@ -186,7 +187,7 @@
                             </div>
                         </td>
                         <td data-label="Status">
-                            <span class="status-badge status-{{ status_class }}">{{ k.status or '-' }}</span>
+                            <span class="status-badge status-{{ status_class }}">{{ k.status|status_label or '-' }}</span>
                         </td>
                         <td data-label="Deadline" class="deadline-cell">{{ k.deadline_text }}</td>
                         <td data-label="Product Knowledge" class="truncate-cell">{{ k.product_knowledge or '-' }}</td>

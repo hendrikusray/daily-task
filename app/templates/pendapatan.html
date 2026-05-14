@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block title %}Pendapatan — Marianne Tracker{% endblock %}
+
+{% block content %}
+<div class="tracker-page">
+
+    <section class="tracker-header">
+        <div class="header-title">
+            <div class="header-avatar">💰</div>
+            <div>
+                <span class="eyebrow">💰 Pendapatan</span>
+                <h1>Income Bulanan</h1>
+                <p>Pendapatan dihitung dari campaign yang statusnya Transfer.</p>
+            </div>
+        </div>
+        <div class="header-actions">
+            <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">🌿 Dashboard</a>
+            <a href="{{ url_for('report') }}" class="btn btn-primary">📊 Report</a>
+        </div>
+    </section>
+
+    <section class="monthly-income-section">
+        <div class="sheet-card">
+            <div class="sheet-toolbar">
+                <div>
+                    <span class="eyebrow">💰 Pendapatan</span>
+                    <h2>Income Bulanan</h2>
+                </div>
+                <div class="income-meta">
+                    <span class="income-status-badge">✅ Status: Transfer</span>
+                </div>
+            </div>
+
+            <div class="income-summary-grid">
+                <div class="income-summary-card income-summary-card-total">
+                    <span>Total Pendapatan Seluruhnya</span>
+                    <strong>{{ total_income | idr }}</strong>
+                </div>
+                <div class="income-summary-card">
+                    <span>Total Sesuai Filter</span>
+                    <strong id="incomeFilteredTotal">{{ total_income | idr }}</strong>
+                </div>
+                <div class="income-summary-card">
+                    <span>Campaign Transfer</span>
+                    <strong><span id="incomeFilteredCount">{{ income_total_campaigns }}</span> campaign</strong>
+                </div>
+            </div>
+
+            <div class="income-filter-bar" aria-label="Filter income bulanan">
+                <label class="income-filter-field" for="incomeMonthFilter">
+                    <span>Bulan</span>
+                    <select id="incomeMonthFilter">
+                        <option value="all">Semua Bulan</option>
+                        {% for month in income_months %}
+                            <option value="{{ month.value }}">{{ month.label }}</option>
+                        {% endfor %}
+                    </select>
+                </label>
+
+                <label class="income-filter-field" for="incomeYearFilter">
+                    <span>Tahun</span>
+                    <select id="incomeYearFilter">
+                        <option value="all">Semua Tahun</option>
+                        {% for y in income_years %}
+                        <option value="{{ y }}">{{ y }}</option>
+                        {% endfor %}
+                    </select>
+                </label>
+
+                <button type="button" class="income-reset-btn" id="incomeFilterReset">Reset</button>
+            </div>
+
+            <div class="tracker-table-wrap">
+                <table class="tracker-table monthly-table">
+                    <thead>
+                        <tr>
+                            <th>Bulan</th>
+                            <th>Campaign Transfer</th>
+                            <th>Total Fee</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in monthly_income %}
+                        <tr data-year="{{ row.year }}"
+                            data-month="{{ row.month }}"
+                            data-count="{{ row.count }}"
+                            data-total="{{ row.total }}"
+                            {% if loop.first %}class="monthly-row-current"{% endif %}>
+                            <td data-label="Bulan"><strong>{{ row.label }}</strong></td>
+                            <td data-label="Campaign Transfer">{{ row.count }} campaign</td>
+                            <td data-label="Total Fee" class="monthly-total" data-raw="{{ row.total }}">{{ row.total | idr }}</td>
+                        </tr>
+                        {% endfor %}
+                        <tr id="incomeEmptyRow" class="income-empty-row" {% if monthly_income %}hidden{% endif %}>
+                            <td colspan="3">Belum ada pendapatan di filter ini.</td>
+                        </tr>
+                        <tr class="income-total-row">
+                            <td colspan="2">Total Sesuai Filter</td>
+                            <td class="monthly-total" id="incomeTableTotal">{{ total_income | idr }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+</div>
+{% endblock %}

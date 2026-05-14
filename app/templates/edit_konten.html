@@ -59,12 +59,13 @@
             </div>
 
             <div class="form-group-full">
-                <label>Platform 📱 <span class="field-hint">Bisa pilih lebih dari 1</span></label>
+                <label>Platform 📱</label>
                 {% set current_platforms = (konten.platform or '').split(', ') %}
-                <div class="multi-select" data-multi-select data-placeholder="— Pilih platform —">
+                <div class="multi-select" data-multi-select data-placeholder="Pilih platform">
                     <button type="button" class="multi-select-trigger" data-multi-select-trigger aria-expanded="false">
-                        <span class="multi-select-summary" data-multi-select-label>— Pilih platform —</span>
-                        <span class="multi-select-caret">⌄</span>
+                        <span class="multi-select-summary" data-multi-select-label>Pilih platform</span>
+                        <span class="multi-select-count" data-multi-select-count hidden>0</span>
+                        <span class="multi-select-caret" aria-hidden="true">⌄</span>
                     </button>
                     <div class="multi-select-menu" data-multi-select-menu>
                     {% for option in platform_options %}
@@ -83,7 +84,7 @@
                 <select id="status" name="status" required>
                     <option value="">— Pilih status —</option>
                     {% for option in status_options %}
-                        <option value="{{ option }}" {% if konten.status == option %}selected{% endif %}>{{ option }}</option>
+                        <option value="{{ option }}" {% if konten.status == option %}selected{% endif %}>{{ option|status_label }}</option>
                     {% endfor %}
                 </select>
             </div>

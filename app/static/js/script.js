@@ -270,6 +270,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function updateMultiSelectLabel(select) {
         const label = select.querySelector('[data-multi-select-label]');
+        const countBadge = select.querySelector('[data-multi-select-count]');
         const checked = Array.from(select.querySelectorAll('input[type="checkbox"]:checked'));
         const placeholder = select.dataset.placeholder || 'Pilih opsi';
         if (!label) return;
@@ -280,13 +281,27 @@ document.addEventListener('DOMContentLoaded', function () {
             ph.className = 'ms-placeholder';
             ph.textContent = placeholder;
             label.appendChild(ph);
+            if (countBadge) {
+                countBadge.hidden = true;
+                countBadge.textContent = '0';
+            }
         } else {
-            checked.forEach(function (input) {
+            checked.slice(0, 2).forEach(function (input) {
                 const pill = document.createElement('span');
                 pill.className = 'ms-pill';
                 pill.textContent = input.value;
                 label.appendChild(pill);
             });
+            if (checked.length > 2) {
+                const more = document.createElement('span');
+                more.className = 'ms-pill ms-pill-more';
+                more.textContent = '+' + (checked.length - 2);
+                label.appendChild(more);
+            }
+            if (countBadge) {
+                countBadge.hidden = false;
+                countBadge.textContent = checked.length;
+            }
         }
     }
 
@@ -321,38 +336,64 @@ document.addEventListener('DOMContentLoaded', function () {
         if (event.key === 'Escape') closeMultiSelects();
     });
 
-    // Income year filter
-    const incomeYearBtns = document.querySelectorAll('.income-year-btn');
-    if (incomeYearBtns.length) {
-        const incomeRows = document.querySelectorAll('.monthly-table tbody tr[data-year]');
-        const grandTotalEl = document.getElementById('incomeGrandTotal');
+    // Income month/year filter
+    const incomeRows = Array.from(document.querySelectorAll('.monthly-table tbody tr[data-year]'));
+    const incomeMonthFilter = document.getElementById('incomeMonthFilter');
+    const incomeYearFilter = document.getElementById('incomeYearFilter');
+    const incomeFilterReset = document.getElementById('incomeFilterReset');
+    const incomeFilteredTotal = document.getElementById('incomeFilteredTotal');
+    const incomeFilteredCount = document.getElementById('incomeFilteredCount');
+    const incomeTableTotal = document.getElementById('incomeTableTotal');
+    const incomeEmptyRow = document.getElementById('incomeEmptyRow');
 
-        function recalcTotal() {
-            let total = 0;
-            incomeRows.forEach(function (row) {
-                if (row.style.display !== 'none') {
-                    const cell = row.querySelector('.monthly-total');
-                    if (cell) {
-                        total += parseInt(cell.dataset.raw || '0', 10);
-                    }
-                }
-            });
-            if (grandTotalEl) {
-                grandTotalEl.textContent = 'Rp ' + total.toLocaleString('id-ID').replace(/,/g, '.');
+    function formatIDR(value) {
+        return 'Rp ' + Number(value || 0).toLocaleString('id-ID');
+    }
+
+    function applyIncomeFilter() {
+        if (!incomeRows.length || !incomeMonthFilter || !incomeYearFilter) return;
+
+        const selectedMonth = incomeMonthFilter.value;
+        const selectedYear = incomeYearFilter.value;
+        let total = 0;
+        let count = 0;
+        let visibleRows = 0;
+        let firstVisibleRow = null;
+
+        incomeRows.forEach(function (row) {
+            const monthMatches = selectedMonth === 'all' || row.dataset.month === selectedMonth;
+            const yearMatches = selectedYear === 'all' || row.dataset.year === selectedYear;
+            const isVisible = monthMatches && yearMatches;
+
+            row.hidden = !isVisible;
+            row.classList.remove('monthly-row-current');
+
+            if (isVisible) {
+                total += parseInt(row.dataset.total || '0', 10);
+                count += parseInt(row.dataset.count || '0', 10);
+                visibleRows += 1;
+                if (!firstVisibleRow) firstVisibleRow = row;
             }
-        }
-
-        incomeYearBtns.forEach(function (btn) {
-            btn.addEventListener('click', function () {
-                incomeYearBtns.forEach(function (b) { b.classList.remove('active'); });
-                btn.classList.add('active');
-                const year = btn.dataset.year;
-                incomeRows.forEach(function (row) {
-                    row.style.display = (year === 'all' || row.dataset.year === year) ? '' : 'none';
-                });
-                recalcTotal();
-            });
         });
+
+        if (firstVisibleRow) firstVisibleRow.classList.add('monthly-row-current');
+        if (incomeFilteredTotal) incomeFilteredTotal.textContent = formatIDR(total);
+        if (incomeFilteredCount) incomeFilteredCount.textContent = count;
+        if (incomeTableTotal) incomeTableTotal.textContent = formatIDR(total);
+        if (incomeEmptyRow) incomeEmptyRow.hidden = visibleRows > 0;
+    }
+
+    if (incomeRows.length && incomeMonthFilter && incomeYearFilter) {
+        incomeMonthFilter.addEventListener('change', applyIncomeFilter);
+        incomeYearFilter.addEventListener('change', applyIncomeFilter);
+        if (incomeFilterReset) {
+            incomeFilterReset.addEventListener('click', function () {
+                incomeMonthFilter.value = 'all';
+                incomeYearFilter.value = 'all';
+                applyIncomeFilter();
+            });
+        }
+        applyIncomeFilter();
     }
 
     // Auto-dismiss alerts after 4.5 seconds

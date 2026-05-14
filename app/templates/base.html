@@ -64,17 +64,10 @@
                 </a>
             </li>
             <li>
-                <a class="{% if request.endpoint in ['buat_konten', 'edit_konten'] %}active{% endif %}"
-                   href="{{ url_for('buat_konten') }}">
-                    <span class="nav-icon">✦</span>
-                    <span>Tambah</span>
-                </a>
-            </li>
-            <li>
-                <a class="{% if request.endpoint == 'report' %}active{% endif %}"
-                   href="{{ url_for('report') }}">
-                    <span class="nav-icon">📊</span>
-                    <span>Report</span>
+                <a class="{% if request.endpoint == 'pendapatan' %}active{% endif %}"
+                   href="{{ url_for('pendapatan') }}">
+                    <span class="nav-icon">💰</span>
+                    <span>Pendapatan</span>
                 </a>
             </li>
             <li>
@@ -82,6 +75,13 @@
                    href="{{ url_for('pengeluaran') }}">
                     <span class="nav-icon">💸</span>
                     <span>Pengeluaran</span>
+                </a>
+            </li>
+            <li>
+                <a class="{% if request.endpoint == 'report' %}active{% endif %}"
+                   href="{{ url_for('report') }}">
+                    <span class="nav-icon">📊</span>
+                    <span>Report</span>
                 </a>
             </li>
         </ul>
