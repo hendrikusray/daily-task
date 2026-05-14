@@ -51,27 +51,19 @@
             </div>
 
             <div class="income-filter-bar" aria-label="Filter income bulanan">
-                <label class="income-filter-field" for="incomeMonthFilter">
-                    <span>Bulan</span>
-                    <select id="incomeMonthFilter">
-                        <option value="all">Semua Bulan</option>
-                        {% for month in income_months %}
-                            <option value="{{ month.value }}">{{ month.label }}</option>
-                        {% endfor %}
-                    </select>
-                </label>
-
-                <label class="income-filter-field" for="incomeYearFilter">
-                    <span>Tahun</span>
-                    <select id="incomeYearFilter">
-                        <option value="all">Semua Tahun</option>
-                        {% for y in income_years %}
+                <select id="incomeMonthFilter" class="income-filter-select">
+                    <option value="all">📅 Semua Bulan</option>
+                    {% for month in income_months %}
+                        <option value="{{ month.value }}">{{ month.label }}</option>
+                    {% endfor %}
+                </select>
+                <select id="incomeYearFilter" class="income-filter-select">
+                    <option value="all">🗓️ Semua Tahun</option>
+                    {% for y in income_years %}
                         <option value="{{ y }}">{{ y }}</option>
-                        {% endfor %}
-                    </select>
-                </label>
-
-                <button type="button" class="income-reset-btn" id="incomeFilterReset">Reset</button>
+                    {% endfor %}
+                </select>
+                <button type="button" class="income-reset-btn" id="incomeFilterReset">✕ Reset</button>
             </div>
 
             <div class="tracker-table-wrap monthly-table-wrap">

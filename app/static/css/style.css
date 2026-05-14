@@ -3186,74 +3186,59 @@ body[data-theme="polka"].auth-page::after {
 
 .income-filter-bar {
     display: flex;
-    align-items: end;
-    gap: 10px;
+    align-items: center;
+    gap: 8px;
     flex-wrap: wrap;
-    padding: 12px 20px 14px;
+    padding: 14px 20px;
     border-top: 1px solid var(--line-soft);
     border-bottom: 1px solid var(--line-soft);
 }
 
-.income-filter-field {
-    display: grid;
-    gap: 5px;
-    min-width: 160px;
-    margin: 0;
-}
-
-.income-filter-field span {
-    color: var(--muted);
-    font-size: 10px;
-    font-weight: 900;
-    letter-spacing: 0.07em;
-    text-transform: uppercase;
-}
-
-.income-filter-field select {
-    min-height: 38px;
-    padding: 8px 34px 8px 12px;
+.income-filter-select {
+    flex: 1;
+    min-width: 130px;
+    height: 40px;
+    padding: 0 12px;
     color: var(--ink-soft);
-    background-color: var(--surface);
+    background: var(--surface);
     border: 1.5px solid var(--line);
-    border-radius: 10px;
+    border-radius: var(--r-pill);
     font: inherit;
     font-size: 13px;
-    font-weight: 800;
+    font-weight: 700;
+    cursor: pointer;
+    appearance: auto;
+    transition: border-color .15s;
+}
+.income-filter-select:focus {
+    outline: none;
+    border-color: var(--lily);
+    box-shadow: 0 0 0 3px var(--lily-glow);
 }
 
 .income-reset-btn {
-    min-height: 38px;
-    padding: 8px 14px;
-    color: var(--lily-dark);
-    background: var(--lily-pale);
-    border: 1.5px solid rgba(168, 43, 92, 0.22);
-    border-radius: 10px;
+    height: 40px;
+    padding: 0 16px;
+    color: var(--muted);
+    background: transparent;
+    border: 1.5px solid var(--line);
+    border-radius: var(--r-pill);
     cursor: pointer;
     font: inherit;
     font-size: 13px;
-    font-weight: 900;
+    font-weight: 700;
+    transition: border-color .15s, color .15s;
+    white-space: nowrap;
+}
+.income-reset-btn:hover {
+    border-color: var(--lily);
+    color: var(--lily-dark);
 }
 
-@media (max-width: 720px) {
-    .income-filter-bar {
-        padding: 12px 14px;
-        gap: 8px;
-    }
-    .income-filter-field {
-        flex: 1 1 0;
-        min-width: 0;
-    }
-    .income-filter-field select {
-        min-height: 36px;
-        font-size: 12px;
-        padding: 7px 28px 7px 10px;
-    }
-    .income-reset-btn {
-        align-self: flex-end;
-        min-height: 36px;
-        padding: 7px 14px;
-        font-size: 12px;
-    }
+@media (max-width: 600px) {
+    .income-filter-bar { padding: 12px 14px; gap: 8px; }
+    .income-filter-select { min-width: 0; font-size: 12px; }
+    .income-reset-btn { font-size: 12px; padding: 0 12px; }
 }
 
 /* === DASHBOARD SEARCH + SORT CONTROLS === */
