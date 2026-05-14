@@ -566,44 +566,6 @@ def pendapatan():
     return render_template('pendapatan.html', **build_income_context(current_user.id))
 
 
-@app.route('/demo/seed', methods=['POST'])
-@login_required
-def demo_seed():
-    from datetime import date, timedelta
-    import random
-    samples = [
-        ('Somethinc', 'Review Niacinamide Serum', 'Beauty', 'Paid', 'Rp 1.500.000', 'IG Feed + Reels', 'Transfer', 0),
-        ('Wardah', 'BPOM Campaign Series', 'Beauty', 'Paid', 'Rp 2.000.000', 'TikTok', 'Transfer', -32),
-        ('Tokopedia', 'Harbolnas 12.12', 'E-Commerce', 'Paid', 'Rp 3.500.000', 'IG Feed, IG Story', 'Transfer', -62),
-        ('Erigo', 'Summer Collection 2025', 'Fashion', 'Paid', 'Rp 1.200.000', 'IG Reels', 'Transfer', -95),
-        ('Scarlett', 'Body Lotion Promo', 'Beauty', 'Paid', 'Rp 800.000', 'TikTok, IG Story', 'Transfer', -120),
-        ('Shopee', 'Flash Sale Collab', 'E-Commerce', 'Paid', 'Rp 2.200.000', 'IG Feed, TikTok', 'Transfer', -155),
-        ('Y.O.U', 'Lip Glaze Launching', 'Beauty', 'Paid', 'Rp 1.800.000', 'IG Reels, TikTok', 'Done', -10),
-        ('Implora', 'GRWM Series', 'Beauty', 'Paid', 'Rp 900.000', 'TikTok', 'On Going', -5),
-        ('Mineral Botanica', 'Loose Powder Review', 'Beauty', 'Barter', 'Rp 0', 'IG Story', 'Done', -40),
-        ('MS Glow', 'Skincare Routine', 'Beauty', 'Paid', 'Rp 2.500.000', 'IG Feed, IG Reels', 'Transfer', -185),
-    ]
-    today = date.today()
-    for brand, campaign, category, payment, fee, platform, status, day_offset in samples:
-        k = Konten(
-            judul='', deskripsi='', isi='',
-            user_id=current_user.id,
-            brand=brand,
-            campaign_project=campaign,
-            category=category,
-            payment=payment,
-            fee=fee,
-            platform=platform,
-            status=status,
-            deadline=today + timedelta(days=day_offset + random.randint(0, 14)),
-            sow='Konten promosi produk sesuai brief brand',
-        )
-        db.session.add(k)
-    db.session.commit()
-    flash('Demo data berhasil ditambahkan! 🎉', 'success')
-    return redirect(url_for('dashboard'))
-
-
 @app.route('/konten/buat', methods=['GET', 'POST'])
 @login_required
 def buat_konten():
