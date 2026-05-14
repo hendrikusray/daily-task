@@ -3066,10 +3066,6 @@ body[data-theme="polka"].auth-page::after {
 
 /* === MONTHLY INCOME TABLE === */
 .monthly-income-section { margin-bottom: 8px; }
-/* Keep chart card clipped on mobile when sheet-card loses overflow:hidden */
-@media (max-width: 840px) {
-    .monthly-income-section .sheet-card { overflow: hidden !important; }
-}
 .monthly-table td, .monthly-table th { white-space: normal; }
 .monthly-total { font-weight: 800; color: var(--sage-dark); font-size: 14px; }
 .monthly-row-current td { background: var(--lily-pale) !important; }
@@ -3339,16 +3335,16 @@ body[data-theme="polka"].auth-page::after {
 
 /* === INCOME CHART === */
 .income-chart-wrap {
-    padding: 20px 24px 24px;
-    position: relative;
-    height: 300px;
+    padding: 16px 20px 20px;
     width: 100%;
-    max-width: 100%;
-    overflow: hidden;
     box-sizing: border-box;
 }
+.income-chart-wrap canvas {
+    width: 100% !important;
+    max-width: 100%;
+}
 @media (max-width: 600px) {
-    .income-chart-wrap { padding: 14px 10px 18px; height: 220px; }
+    .income-chart-wrap { padding: 12px 10px 16px; }
 }
 
 /* === PENGELUARAN PAGE === */
