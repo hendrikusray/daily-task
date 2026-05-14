@@ -3084,38 +3084,18 @@ body[data-theme="polka"].auth-page::after {
 }
 
 @media (max-width: 840px) {
-    /* Keep monthly-table as a real table, don't inherit dashboard card style */
-    .monthly-table,
-    .monthly-table tbody,
-    .monthly-table thead,
-    .monthly-table tr,
+    /* Force monthly-table back to real table — override the dashboard block layout */
+    .monthly-table         { display: table !important; width: 100% !important; border-collapse: collapse !important; border-spacing: 0 !important; background: transparent !important; box-shadow: none !important; border: none !important; }
+    .monthly-table thead   { display: table-header-group !important; }
+    .monthly-table tbody   { display: table-row-group !important; }
+    .monthly-table tr      { display: table-row !important; flex-direction: unset !important; background: transparent !important; border: none !important; box-shadow: none !important; border-radius: 0 !important; border-left-width: 0 !important; overflow: visible !important; }
     .monthly-table td,
-    .monthly-table th {
-        display: revert;
-        width: auto;
-    }
-    .monthly-table {
-        width: 100%;
-        border-collapse: collapse;
-        border-spacing: 0;
-        background: transparent;
-        box-shadow: none;
-        border: none;
-    }
-    .monthly-table thead { display: table-header-group; }
-    .monthly-table tr { display: table-row; background: transparent; border: none; box-shadow: none; border-radius: 0; border-left-width: 0; }
-    .monthly-table td, .monthly-table th {
-        display: table-cell;
-        padding: 14px 16px;
-        border: none;
-        border-bottom: 1px solid var(--line-soft);
-        white-space: normal;
-        word-break: break-word;
-        grid-template-columns: none;
-    }
-    .monthly-table td::before { display: none; }
-    .monthly-table th { font-size: 11px; padding: 10px 16px; }
-    .monthly-table .monthly-total { white-space: nowrap; }
+    .monthly-table th      { display: table-cell !important; width: auto !important; padding: 13px 14px !important; border: none !important; border-bottom: 1px solid var(--line-soft) !important; grid-template-columns: none !important; white-space: normal !important; word-break: break-word !important; }
+    .monthly-table td::before { display: none !important; }
+    .monthly-table th      { font-size: 11px !important; font-weight: 800 !important; padding: 10px 14px !important; }
+    .monthly-table .monthly-total { white-space: nowrap !important; }
+    /* Make the table scrollable if needed on very small screens */
+    .monthly-table-wrap    { overflow-x: auto; }
 }
 
 /* income header meta */
