@@ -61,11 +61,10 @@
 
 /* === RESET === */
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-html { min-height: 100%; scroll-behavior: smooth; overflow-x: hidden; }
+html { min-height: 100%; scroll-behavior: smooth; }
 
 body {
     min-height: 100vh;
-    overflow-x: hidden;
     color: var(--ink);
     font-family: 'Nunito', 'Segoe UI', system-ui, sans-serif;
     font-size: 15px;
@@ -80,7 +79,7 @@ a { color: inherit; }
 .container { width: 100%; max-width: 1440px; margin: 0 auto; padding: 20px; }
 .app-page .container { padding-top: 0; padding-bottom: 60px; }
 .app-shell { display: flex; min-height: 100vh; }
-.app-main  { flex: 1; min-width: 0; padding: 26px 0; }
+.app-main  { flex: 1; min-width: 0; overflow-x: hidden; padding: 26px 0; }
 
 /* ================================================================
    AUTH PAGE — soft lily pattern

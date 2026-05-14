@@ -111,7 +111,7 @@
                 </div>
             </div>
             <div class="income-chart-wrap">
-                <canvas id="incomeChart" height="80"></canvas>
+                <canvas id="incomeChart"></canvas>
             </div>
         </div>
     </section>
@@ -156,6 +156,7 @@
         options: {
             responsive: true,
             maintainAspectRatio: true,
+            aspectRatio: window.innerWidth < 600 ? 1.6 : 3,
             plugins: {
                 legend: { display: false },
                 tooltip: {
