@@ -27,6 +27,9 @@
                     <span class="eyebrow">💰 Pendapatan</span>
                     <h2>Income Bulanan</h2>
                 </div>
+                <div class="income-meta">
+                    <span class="income-status-badge">✅ Status: Transfer</span>
+                </div>
             </div>
 
             <div class="income-stat-grid">
@@ -36,40 +39,48 @@
                     <div class="income-stat-value">{{ total_income | idr }}</div>
                 </div>
                 <div class="income-stat-card income-stat-gold">
-                    <div class="income-stat-icon">📆</div>
-                    <div class="income-stat-label">Periode Ini</div>
+                    <div class="income-stat-icon">🔍</div>
+                    <div class="income-stat-label">Sesuai Filter</div>
                     <div class="income-stat-value" id="incomeFilteredTotal">{{ total_income | idr }}</div>
                 </div>
                 <div class="income-stat-card income-stat-sage">
                     <div class="income-stat-icon">✅</div>
-                    <div class="income-stat-label">Lunas</div>
+                    <div class="income-stat-label">Campaign Transfer</div>
                     <div class="income-stat-value"><span id="incomeFilteredCount">{{ income_total_campaigns }}</span></div>
                 </div>
             </div>
 
             <div class="income-filter-bar" aria-label="Filter income bulanan">
-                <select id="incomeMonthFilter" class="income-filter-select">
-                    <option value="all">📅 Semua Bulan</option>
-                    {% for month in income_months %}
-                        <option value="{{ month.value }}">{{ month.label }}</option>
-                    {% endfor %}
-                </select>
-                <select id="incomeYearFilter" class="income-filter-select">
-                    <option value="all">🗓️ Semua Tahun</option>
-                    {% for y in income_years %}
+                <label class="income-filter-field" for="incomeMonthFilter">
+                    <span>Bulan</span>
+                    <select id="incomeMonthFilter">
+                        <option value="all">Semua Bulan</option>
+                        {% for month in income_months %}
+                            <option value="{{ month.value }}">{{ month.label }}</option>
+                        {% endfor %}
+                    </select>
+                </label>
+
+                <label class="income-filter-field" for="incomeYearFilter">
+                    <span>Tahun</span>
+                    <select id="incomeYearFilter">
+                        <option value="all">Semua Tahun</option>
+                        {% for y in income_years %}
                         <option value="{{ y }}">{{ y }}</option>
-                    {% endfor %}
-                </select>
-                <button type="button" class="income-reset-btn" id="incomeFilterReset">✕ Reset</button>
+                        {% endfor %}
+                    </select>
+                </label>
+
+                <button type="button" class="income-reset-btn" id="incomeFilterReset">Reset</button>
             </div>
 
-            <div class="tracker-table-wrap monthly-table-wrap">
+            <div class="tracker-table-wrap">
                 <table class="tracker-table monthly-table">
                     <thead>
                         <tr>
                             <th>Bulan</th>
-                            <th>Campaign</th>
-                            <th>Total</th>
+                            <th>Campaign Transfer</th>
+                            <th>Total Fee</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -88,7 +99,7 @@
                             <td colspan="3">Belum ada pendapatan di filter ini.</td>
                         </tr>
                         <tr class="income-total-row">
-                            <td colspan="2">Total</td>
+                            <td colspan="2">Total Sesuai Filter</td>
                             <td class="monthly-total" id="incomeTableTotal">{{ total_income | idr }}</td>
                         </tr>
                     </tbody>
@@ -108,7 +119,7 @@
                 </div>
             </div>
             <div class="income-chart-wrap">
-                <canvas id="incomeChart"></canvas>
+                <canvas id="incomeChart" height="120"></canvas>
             </div>
         </div>
     </section>
@@ -152,7 +163,6 @@
         },
         options: {
             responsive: true,
-            maintainAspectRatio: false,
             plugins: {
                 legend: { display: false },
                 tooltip: {

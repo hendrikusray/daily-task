@@ -3065,7 +3065,7 @@ body[data-theme="polka"].auth-page::after {
 
 /* === MONTHLY INCOME TABLE === */
 .monthly-income-section { margin-bottom: 8px; }
-.monthly-table td, .monthly-table th { white-space: normal; }
+.monthly-table td, .monthly-table th { white-space: nowrap; }
 .monthly-total { font-weight: 800; color: var(--sage-dark); font-size: 14px; }
 .monthly-row-current td { background: var(--lily-pale) !important; }
 .monthly-row-current .monthly-total { color: var(--lily-dark); font-size: 15px; }
@@ -3084,46 +3084,38 @@ body[data-theme="polka"].auth-page::after {
 }
 
 @media (max-width: 840px) {
-    /* Monthly table: card layout on mobile, same approach as dashboard */
+    /* Keep monthly-table as a real table, don't inherit dashboard card style */
     .monthly-table,
-    .monthly-table tbody  { display: block !important; width: 100% !important; }
-    .monthly-table thead  { display: none !important; }
-    .monthly-table tr {
-        display: flex !important;
-        flex-wrap: wrap !important;
-        align-items: baseline !important;
-        gap: 4px 12px !important;
-        padding: 12px 16px !important;
-        border-bottom: 1px solid var(--line-soft) !important;
-        background: transparent !important;
-        box-shadow: none !important;
-        border-radius: 0 !important;
-        border-left-width: 0 !important;
+    .monthly-table tbody,
+    .monthly-table thead,
+    .monthly-table tr,
+    .monthly-table td,
+    .monthly-table th {
+        display: revert;
+        width: auto;
     }
-    .monthly-table td {
-        display: inline !important;
-        padding: 0 !important;
-        border: none !important;
-        width: auto !important;
+    .monthly-table {
+        width: 100%;
+        border-collapse: collapse;
+        border-spacing: 0;
+        background: transparent;
+        box-shadow: none;
+        border: none;
     }
-    .monthly-table td::before { display: none !important; }
-    /* Bulan = full row */
-    .monthly-table td:first-child {
-        display: block !important;
-        width: 100% !important;
-        font-weight: 800 !important;
-        font-size: 14px !important;
-        margin-bottom: 2px !important;
+    .monthly-table thead { display: table-header-group; }
+    .monthly-table tr { display: table-row; background: transparent; border: none; box-shadow: none; border-radius: 0; border-left-width: 0; }
+    .monthly-table td, .monthly-table th {
+        display: table-cell;
+        padding: 14px 16px;
+        border: none;
+        border-bottom: 1px solid var(--line-soft);
+        white-space: normal;
+        word-break: break-word;
+        grid-template-columns: none;
     }
-    /* Campaign count = muted */
-    .monthly-table td:nth-child(2) { color: var(--muted) !important; font-size: 13px !important; }
-    /* Total = right-aligned */
-    .monthly-table td:last-child { margin-left: auto !important; }
-    /* Total and income-total rows */
-    .monthly-table .income-total-row td:first-child {
-        font-weight: 800 !important;
-        font-size: 14px !important;
-    }
+    .monthly-table td::before { display: none; }
+    .monthly-table th { font-size: 11px; padding: 10px 16px; }
+    .monthly-table .monthly-total { white-space: nowrap; }
 }
 
 /* income header meta */
@@ -3214,59 +3206,74 @@ body[data-theme="polka"].auth-page::after {
 
 .income-filter-bar {
     display: flex;
-    align-items: center;
-    gap: 8px;
+    align-items: end;
+    gap: 10px;
     flex-wrap: wrap;
-    padding: 14px 20px;
+    padding: 12px 20px 14px;
     border-top: 1px solid var(--line-soft);
     border-bottom: 1px solid var(--line-soft);
 }
 
-.income-filter-select {
-    flex: 1;
-    min-width: 0;
-    height: 40px;
-    padding: 0 12px;
+.income-filter-field {
+    display: grid;
+    gap: 5px;
+    min-width: 160px;
+    margin: 0;
+}
+
+.income-filter-field span {
+    color: var(--muted);
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+}
+
+.income-filter-field select {
+    min-height: 38px;
+    padding: 8px 34px 8px 12px;
     color: var(--ink-soft);
-    background: var(--surface);
+    background-color: var(--surface);
     border: 1.5px solid var(--line);
-    border-radius: var(--r-pill);
+    border-radius: 10px;
     font: inherit;
     font-size: 13px;
-    font-weight: 700;
-    cursor: pointer;
-    appearance: auto;
-    transition: border-color .15s;
-}
-.income-filter-select:focus {
-    outline: none;
-    border-color: var(--lily);
-    box-shadow: 0 0 0 3px var(--lily-glow);
+    font-weight: 800;
 }
 
 .income-reset-btn {
-    height: 40px;
-    padding: 0 16px;
-    color: var(--muted);
-    background: transparent;
-    border: 1.5px solid var(--line);
-    border-radius: var(--r-pill);
+    min-height: 38px;
+    padding: 8px 14px;
+    color: var(--lily-dark);
+    background: var(--lily-pale);
+    border: 1.5px solid rgba(168, 43, 92, 0.22);
+    border-radius: 10px;
     cursor: pointer;
     font: inherit;
     font-size: 13px;
-    font-weight: 700;
-    transition: border-color .15s, color .15s;
-    white-space: nowrap;
-}
-.income-reset-btn:hover {
-    border-color: var(--lily);
-    color: var(--lily-dark);
+    font-weight: 900;
 }
 
-@media (max-width: 600px) {
-    .income-filter-bar { padding: 12px 14px; gap: 8px; }
-    .income-filter-select { min-width: 0; font-size: 12px; }
-    .income-reset-btn { font-size: 12px; padding: 0 12px; }
+@media (max-width: 720px) {
+    .income-filter-bar {
+        padding: 12px 14px;
+        gap: 8px;
+    }
+    .income-filter-field {
+        flex: 1 1 0;
+        min-width: 0;
+    }
+    .income-filter-field select {
+        min-height: 36px;
+        font-size: 12px;
+        padding: 7px 28px 7px 10px;
+    }
+    .income-reset-btn {
+        align-self: flex-end;
+        min-height: 36px;
+        padding: 7px 14px;
+        font-size: 12px;
+    }
 }
 
 /* === DASHBOARD SEARCH + SORT CONTROLS === */
@@ -3362,12 +3369,10 @@ body[data-theme="polka"].auth-page::after {
 
 /* === INCOME CHART === */
 .income-chart-wrap {
-    position: relative;
-    height: 280px;
-    padding: 16px 20px 20px;
+    padding: 20px 24px 24px;
 }
 @media (max-width: 600px) {
-    .income-chart-wrap { height: 200px; padding: 12px 10px 16px; }
+    .income-chart-wrap { padding: 14px 10px 18px; }
 }
 
 /* === PENGELUARAN PAGE === */
