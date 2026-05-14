@@ -515,9 +515,34 @@ def login():
 @app.route('/dashboard')
 @login_required
 def dashboard():
+    from sqlalchemy import case as sa_case
     page = request.args.get('page', 1, type=int)
-    konten_list = ordered_tracker_query().paginate(page=page, per_page=25)
-    total_konten = Konten.query.filter_by(user_id=current_user.id).count()
+    q    = request.args.get('q', '').strip()
+    sort = request.args.get('sort', 'deadline')
+
+    query = Konten.query.filter_by(user_id=current_user.id)
+
+    if q:
+        like = f'%{q}%'
+        query = query.filter(or_(
+            Konten.brand.ilike(like),
+            Konten.campaign_project.ilike(like),
+            Konten.category.ilike(like),
+            Konten.status.ilike(like),
+        ))
+
+    if sort == 'brand':
+        query = query.order_by(Konten.brand.asc(), Konten.created_at.desc())
+    elif sort == 'status':
+        query = query.order_by(Konten.status.asc(), Konten.deadline.asc())
+    elif sort == 'newest':
+        query = query.order_by(Konten.created_at.desc())
+    else:
+        done_last = sa_case((Konten.status.in_(FINISHED_STATUS_OPTIONS), 1), else_=0)
+        query = query.order_by(done_last, Konten.deadline.is_(None), Konten.deadline.asc(), Konten.created_at.desc())
+
+    konten_list   = query.paginate(page=page, per_page=20)
+    total_konten  = Konten.query.filter_by(user_id=current_user.id).count()
     due_soon_count = due_soon_query().count()
     done_count = Konten.query.filter(
         Konten.user_id == current_user.id,
@@ -529,7 +554,9 @@ def dashboard():
         konten_list=konten_list,
         total_konten=total_konten,
         due_soon_count=due_soon_count,
-        done_count=done_count
+        done_count=done_count,
+        q=q,
+        sort=sort,
     )
 
 

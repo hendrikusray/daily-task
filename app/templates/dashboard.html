@@ -42,14 +42,37 @@
     </section>
 
     <!-- Table -->
-    {% if konten_list.items %}
+    {% if total_konten > 0 %}
     <div class="sheet-card">
         <div class="sheet-toolbar">
             <div>
                 <span class="eyebrow">🌸 Workspace</span>
                 <h2>Daftar Campaign</h2>
             </div>
+            <span class="deadline-legend">{{ konten_list.total }} hasil{% if q %} untuk "{{ q }}"{% endif %}</span>
         </div>
+
+        <!-- Search + Sort Controls -->
+        <form class="dash-controls" method="GET" action="{{ url_for('dashboard') }}">
+            <div class="dash-search-wrap">
+                <span class="dash-search-icon">🔍</span>
+                <input type="text" name="q" class="dash-search" value="{{ q }}"
+                       placeholder="Cari brand, campaign, status..."
+                       autocomplete="off">
+                {% if q %}<a href="{{ url_for('dashboard', sort=sort) }}" class="dash-search-clear" title="Reset pencarian">✕</a>{% endif %}
+            </div>
+            <div class="sort-pills">
+                <span class="sort-label">Urut:</span>
+                <button type="submit" name="sort" value="deadline"
+                        class="sort-pill {% if sort == 'deadline' or not sort %}active{% endif %}">📅 Deadline</button>
+                <button type="submit" name="sort" value="brand"
+                        class="sort-pill {% if sort == 'brand' %}active{% endif %}">Brand</button>
+                <button type="submit" name="sort" value="status"
+                        class="sort-pill {% if sort == 'status' %}active{% endif %}">Status</button>
+                <button type="submit" name="sort" value="newest"
+                        class="sort-pill {% if sort == 'newest' %}active{% endif %}">Terbaru</button>
+            </div>
+        </form>
 
         <div class="tracker-table-wrap">
             <table class="tracker-table">
@@ -137,22 +160,31 @@
     {% if konten_list.pages > 1 %}
     <div class="pagination">
         {% if konten_list.has_prev %}
-            <a href="{{ url_for('dashboard', page=1) }}">« Awal</a>
-            <a href="{{ url_for('dashboard', page=konten_list.prev_num) }}">‹ Prev</a>
+            <a href="{{ url_for('dashboard', page=1, q=q, sort=sort) }}">« Awal</a>
+            <a href="{{ url_for('dashboard', page=konten_list.prev_num, q=q, sort=sort) }}">‹ Prev</a>
         {% endif %}
         {% for page_num in konten_list.iter_pages() %}
             {% if page_num %}
                 {% if page_num == konten_list.page %}
                     <span class="active">{{ page_num }}</span>
                 {% else %}
-                    <a href="{{ url_for('dashboard', page=page_num) }}">{{ page_num }}</a>
+                    <a href="{{ url_for('dashboard', page=page_num, q=q, sort=sort) }}">{{ page_num }}</a>
                 {% endif %}
             {% endif %}
         {% endfor %}
         {% if konten_list.has_next %}
-            <a href="{{ url_for('dashboard', page=konten_list.next_num) }}">Next ›</a>
-            <a href="{{ url_for('dashboard', page=konten_list.pages) }}">Akhir »</a>
+            <a href="{{ url_for('dashboard', page=konten_list.next_num, q=q, sort=sort) }}">Next ›</a>
+            <a href="{{ url_for('dashboard', page=konten_list.pages, q=q, sort=sort) }}">Akhir »</a>
         {% endif %}
+    </div>
+    {% endif %}
+
+    {% if not konten_list.items and q %}
+    <div class="empty-state" style="padding: 40px 24px">
+        <div class="empty-icon">🔍</div>
+        <h3>Tidak ditemukan</h3>
+        <p>Tidak ada campaign yang cocok dengan "<strong>{{ q }}</strong>".</p>
+        <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">Tampilkan semua</a>
     </div>
     {% endif %}
 
