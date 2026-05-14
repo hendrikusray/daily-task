@@ -79,7 +79,7 @@ a { color: inherit; }
 .container { width: 100%; max-width: 1440px; margin: 0 auto; padding: 20px; }
 .app-page .container { padding-top: 0; padding-bottom: 60px; }
 .app-shell { display: flex; min-height: 100vh; }
-.app-main  { flex: 1; min-width: 0; overflow-x: hidden; padding: 26px 0; }
+.app-main  { flex: 1; min-width: 0; padding: 26px 0; }
 
 /* ================================================================
    AUTH PAGE — soft lily pattern
@@ -3196,7 +3196,7 @@ body[data-theme="polka"].auth-page::after {
 
 .income-filter-select {
     flex: 1;
-    min-width: 130px;
+    min-width: 0;
     height: 40px;
     padding: 0 12px;
     color: var(--ink-soft);
