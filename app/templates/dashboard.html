@@ -48,26 +48,43 @@
             <div class="sheet-toolbar">
                 <div>
                     <span class="eyebrow">💰 Pendapatan</span>
-                    <h2>Income Bulanan (Paid)</h2>
+                    <h2>Income Bulanan</h2>
+                </div>
+                <div class="income-meta">
+                    <span class="income-status-badge">✅ Payment: Paid</span>
                 </div>
             </div>
+
+            {% if income_years | length > 0 %}
+            <div class="income-filter-bar">
+                <button class="income-year-btn active" data-year="all">Semua</button>
+                {% for y in income_years %}
+                <button class="income-year-btn" data-year="{{ y }}">{{ y }}</button>
+                {% endfor %}
+            </div>
+            {% endif %}
+
             <div class="tracker-table-wrap">
                 <table class="tracker-table monthly-table">
                     <thead>
                         <tr>
                             <th>Bulan</th>
-                            <th>Jumlah Campaign</th>
+                            <th>Campaign Paid</th>
                             <th>Total Fee</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for row in monthly_income %}
-                        <tr {% if loop.first %}class="monthly-row-current"{% endif %}>
+                        <tr data-year="{{ row.key[:4] }}" {% if loop.first %}class="monthly-row-current"{% endif %}>
                             <td data-label="Bulan"><strong>{{ row.label }}</strong></td>
-                            <td data-label="Jumlah Campaign">{{ row.count }} campaign</td>
-                            <td data-label="Total Fee" class="monthly-total">{{ row.total | idr }}</td>
+                            <td data-label="Campaign Paid">{{ row.count }} campaign</td>
+                            <td data-label="Total Fee" class="monthly-total" data-raw="{{ row.total }}">{{ row.total | idr }}</td>
                         </tr>
                         {% endfor %}
+                        <tr class="income-total-row">
+                            <td colspan="2">Grand Total</td>
+                            <td class="monthly-total" id="incomeGrandTotal">{{ total_income | idr }}</td>
+                        </tr>
                     </tbody>
                 </table>
             </div>

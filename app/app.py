@@ -467,7 +467,7 @@ def dashboard():
         key = ref.strftime('%Y-%m')
         monthly_buckets[key]['count'] += 1
         monthly_buckets[key]['total'] += parse_fee(k.fee)
-    sorted_keys = sorted(monthly_buckets.keys(), reverse=True)[:6]
+    sorted_keys = sorted(monthly_buckets.keys(), reverse=True)
     monthly_income = [
         {
             'key': m,
@@ -477,6 +477,8 @@ def dashboard():
         }
         for m in sorted_keys
     ]
+    total_income = sum(monthly_buckets[m]['total'] for m in monthly_buckets)
+    income_years = sorted({m[:4] for m in monthly_buckets}, reverse=True)
 
     return render_template(
         'dashboard.html',
@@ -484,7 +486,9 @@ def dashboard():
         total_konten=total_konten,
         due_soon_count=due_soon_count,
         done_count=done_count,
-        monthly_income=monthly_income
+        monthly_income=monthly_income,
+        total_income=total_income,
+        income_years=income_years
     )
 
 
