@@ -39,13 +39,13 @@
                     <div class="income-stat-value">{{ total_income | idr }}</div>
                 </div>
                 <div class="income-stat-card income-stat-gold">
-                    <div class="income-stat-icon">🔍</div>
-                    <div class="income-stat-label">Sesuai Filter</div>
+                    <div class="income-stat-icon">📆</div>
+                    <div class="income-stat-label">Periode Ini</div>
                     <div class="income-stat-value" id="incomeFilteredTotal">{{ total_income | idr }}</div>
                 </div>
                 <div class="income-stat-card income-stat-sage">
                     <div class="income-stat-icon">✅</div>
-                    <div class="income-stat-label">Campaign Transfer</div>
+                    <div class="income-stat-label">Lunas</div>
                     <div class="income-stat-value"><span id="incomeFilteredCount">{{ income_total_campaigns }}</span></div>
                 </div>
             </div>
@@ -79,8 +79,8 @@
                     <thead>
                         <tr>
                             <th>Bulan</th>
-                            <th>Campaign Transfer</th>
-                            <th>Total Fee</th>
+                            <th>Campaign</th>
+                            <th>Total</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -99,7 +99,7 @@
                             <td colspan="3">Belum ada pendapatan di filter ini.</td>
                         </tr>
                         <tr class="income-total-row">
-                            <td colspan="2">Total Sesuai Filter</td>
+                            <td colspan="2">Total</td>
                             <td class="monthly-total" id="incomeTableTotal">{{ total_income | idr }}</td>
                         </tr>
                     </tbody>
