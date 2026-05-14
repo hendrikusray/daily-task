@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+
+{% block title %}Pengeluaran — Marianne Tracker{% endblock %}
+
+{% block content %}
+<div class="tracker-page">
+
+    <!-- Header -->
+    <section class="tracker-header">
+        <div class="header-title">
+            <div class="header-avatar">💸</div>
+            <div>
+                <span class="eyebrow">💸 Pengeluaran</span>
+                <h1>Daftar Pengeluaran</h1>
+                <p>Catat semua pengeluaran bisnis kamu di sini.</p>
+            </div>
+        </div>
+        <div class="header-actions">
+            <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">🌿 Dashboard</a>
+            <a href="{{ url_for('buat_pengeluaran') }}" class="btn btn-primary">+ Tambah</a>
+        </div>
+    </section>
+
+    <!-- Stat Cards -->
+    <section class="stat-grid" aria-label="Ringkasan pengeluaran">
+        <div class="stat-card expense-stat-total">
+            <div class="stat-icon">💰</div>
+            <div class="stat-label">Total Pengeluaran</div>
+            <div class="stat-value" style="font-size:18px">{{ total_all | idr }}</div>
+        </div>
+        <div class="stat-card stat-card-total">
+            <div class="stat-icon">📋</div>
+            <div class="stat-label">Jumlah Transaksi</div>
+            <div class="stat-value">{{ items | length }}</div>
+        </div>
+        {% if monthly_expense %}
+        <div class="stat-card stat-card-warning">
+            <div class="stat-icon">📅</div>
+            <div class="stat-label">{{ monthly_expense[0].label }}</div>
+            <div class="stat-value" style="font-size:18px">{{ monthly_expense[0].total | idr }}</div>
+        </div>
+        {% endif %}
+    </section>
+
+    <!-- Monthly Summary -->
+    {% if monthly_expense %}
+    <div class="sheet-card" style="margin-bottom:16px">
+        <div class="sheet-toolbar">
+            <div>
+                <span class="eyebrow">📊 Per Bulan</span>
+                <h2>Ringkasan Bulanan</h2>
+            </div>
+        </div>
+        <div class="tracker-table-wrap">
+            <table class="tracker-table monthly-table">
+                <thead>
+                    <tr>
+                        <th>Bulan</th>
+                        <th>Transaksi</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in monthly_expense %}
+                    <tr {% if loop.first %}class="monthly-row-current"{% endif %}>
+                        <td data-label="Bulan"><strong>{{ row.label }}</strong></td>
+                        <td data-label="Transaksi">{{ row.count }}x</td>
+                        <td data-label="Total" class="monthly-total expense-amount">{{ row.total | idr }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Expense Table -->
+    <div class="sheet-card">
+        <div class="sheet-toolbar">
+            <div>
+                <span class="eyebrow">🗂️ Semua Data</span>
+                <h2>Riwayat Pengeluaran</h2>
+            </div>
+        </div>
+        <div class="tracker-table-wrap">
+            <table class="tracker-table expense-table">
+                <thead>
+                    <tr>
+                        <th>Tanggal</th>
+                        <th>Kategori</th>
+                        <th>Deskripsi</th>
+                        <th>Jumlah</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in items %}
+                    <tr>
+                        <td data-label="Tanggal" class="deadline-cell">{{ item.tanggal.strftime('%d/%m/%Y') }}</td>
+                        <td data-label="Kategori">
+                            <span class="kategori-pill">{{ item.kategori }}</span>
+                        </td>
+                        <td data-label="Deskripsi" class="muted-cell">{{ item.deskripsi or '-' }}</td>
+                        <td data-label="Jumlah" class="expense-amount">{{ item.jumlah | idr }}</td>
+                        <td data-label="Aksi" onclick="event.stopPropagation()">
+                            <div class="table-actions">
+                                <a href="{{ url_for('edit_pengeluaran', id=item.id) }}" class="btn btn-secondary btn-sm">✏️</a>
+                                <form method="POST" action="{{ url_for('delete_pengeluaran', id=item.id) }}"
+                                      class="konten-delete-form"
+                                      data-delete-title="{{ (item.deskripsi or item.kategori)|e }}">
+                                    <button type="submit" class="btn btn-danger btn-sm">🗑️</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" class="empty-row">💸 Belum ada pengeluaran tercatat.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

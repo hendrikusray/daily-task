@@ -256,6 +256,64 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    // Multi-select dropdowns
+    const multiSelects = Array.from(document.querySelectorAll('[data-multi-select]'));
+
+    function closeMultiSelects(except) {
+        multiSelects.forEach(function (select) {
+            if (select === except) return;
+            const trigger = select.querySelector('[data-multi-select-trigger]');
+            select.classList.remove('open');
+            if (trigger) trigger.setAttribute('aria-expanded', 'false');
+        });
+    }
+
+    function updateMultiSelectLabel(select) {
+        const label = select.querySelector('[data-multi-select-label]');
+        const checked = Array.from(select.querySelectorAll('input[type="checkbox"]:checked'));
+        const placeholder = select.dataset.placeholder || 'Pilih opsi';
+        if (!label) return;
+
+        if (!checked.length) {
+            label.textContent = placeholder;
+        } else if (checked.length <= 2) {
+            label.textContent = checked.map(function (input) { return input.value; }).join(', ');
+        } else {
+            label.textContent = checked[0].value + ', +' + (checked.length - 1) + ' lainnya';
+        }
+    }
+
+    multiSelects.forEach(function (select) {
+        const trigger = select.querySelector('[data-multi-select-trigger]');
+        const inputs = select.querySelectorAll('input[type="checkbox"]');
+        updateMultiSelectLabel(select);
+
+        if (trigger) {
+            trigger.addEventListener('click', function () {
+                const willOpen = !select.classList.contains('open');
+                closeMultiSelects(select);
+                select.classList.toggle('open', willOpen);
+                trigger.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+            });
+        }
+
+        inputs.forEach(function (input) {
+            input.addEventListener('change', function () {
+                updateMultiSelectLabel(select);
+            });
+        });
+    });
+
+    document.addEventListener('click', function (event) {
+        if (!event.target.closest('[data-multi-select]')) {
+            closeMultiSelects();
+        }
+    });
+
+    document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape') closeMultiSelects();
+    });
+
     // Auto-dismiss alerts after 4.5 seconds
     document.querySelectorAll('.alert').forEach(function (alert) {
         setTimeout(function () {

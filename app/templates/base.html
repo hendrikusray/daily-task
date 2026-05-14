@@ -77,6 +77,13 @@
                     <span>Report</span>
                 </a>
             </li>
+            <li>
+                <a class="{% if request.endpoint in ['pengeluaran', 'buat_pengeluaran', 'edit_pengeluaran'] %}active{% endif %}"
+                   href="{{ url_for('pengeluaran') }}">
+                    <span class="nav-icon">💸</span>
+                    <span>Pengeluaran</span>
+                </a>
+            </li>
         </ul>
 
         <div class="theme-picker-wrap">

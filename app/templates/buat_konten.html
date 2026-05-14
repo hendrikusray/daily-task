@@ -54,13 +54,21 @@
             </div>
 
             <div class="form-group-full">
-                <label for="platform">Platform 📱</label>
-                <select id="platform" name="platform" required>
-                    <option value="">— Pilih platform —</option>
+                <label>Platform 📱 <span class="field-hint">Bisa pilih lebih dari 1</span></label>
+                <div class="multi-select" data-multi-select data-placeholder="— Pilih platform —">
+                    <button type="button" class="multi-select-trigger" data-multi-select-trigger aria-expanded="false">
+                        <span class="multi-select-summary" data-multi-select-label>— Pilih platform —</span>
+                        <span class="multi-select-caret">⌄</span>
+                    </button>
+                    <div class="multi-select-menu" data-multi-select-menu>
                     {% for option in platform_options %}
-                        <option value="{{ option }}">{{ option }}</option>
+                        <label class="multi-select-option">
+                            <input type="checkbox" name="platform" value="{{ option }}">
+                            <span>{{ option }}</span>
+                        </label>
                     {% endfor %}
-                </select>
+                    </div>
+                </div>
             </div>
 
             <div class="form-group-full">

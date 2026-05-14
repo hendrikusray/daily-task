@@ -1,11 +1,12 @@
 import os
+import re
 import uuid
 from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import date, datetime, timedelta
-from sqlalchemy import inspect, text
+from sqlalchemy import inspect, or_, text
 
 app = Flask(__name__, template_folder='templates', static_folder='static')
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'your-secret-key-change-this-in-production')
@@ -61,6 +62,7 @@ STATUS_OPTIONS = [
     "Waiting client's payment",
     'DONE'
 ]
+EXPENSE_CATEGORY_OPTIONS = ['Editor', 'Asisten', 'Transport', 'Peralatan', 'Software', 'Lain-lain']
 
 # ============ DATABASE MODELS ============
 class User(UserMixin, db.Model):
@@ -137,6 +139,16 @@ class Konten(db.Model):
         return self.deadline.strftime('%d/%m/%Y')
 
 
+class Pengeluaran(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    tanggal = db.Column(db.Date, nullable=False)
+    kategori = db.Column(db.String(80), nullable=False)
+    deskripsi = db.Column(db.String(300), nullable=True)
+    jumlah = db.Column(db.Integer, nullable=False, default=0)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
@@ -151,6 +163,20 @@ def parse_date(value):
         return None
 
 
+def parse_fee(fee_str):
+    if not fee_str:
+        return 0
+    digits = re.sub(r'[^\d]', '', fee_str)
+    return int(digits) if digits else 0
+
+
+@app.template_filter('idr')
+def idr_filter(amount):
+    if not amount:
+        return 'Rp 0'
+    return 'Rp ' + f'{int(amount):,}'.replace(',', '.')
+
+
 def form_text(name):
     return (request.form.get(name) or '').strip()
 
@@ -162,7 +188,8 @@ def apply_tracker_form(konten):
     konten.payment = form_text('payment')
     konten.fee = form_text('fee')
     konten.sow = form_text('sow')
-    konten.platform = form_text('platform')
+    platforms = request.form.getlist('platform')
+    konten.platform = ', '.join(platforms) if platforms else ''
     konten.status = form_text('status')
     konten.deadline = parse_date(form_text('deadline'))
     konten.product_knowledge = form_text('product_knowledge')
@@ -182,11 +209,12 @@ def validate_tracker_form():
         'brand': 'Brand',
         'campaign_project': 'Campaign/Project',
         'payment': 'Payment',
-        'platform': 'Platform',
         'status': 'Status',
         'deadline': 'Deadline'
     }
     missing = [label for field, label in required_fields.items() if not form_text(field)]
+    if not request.form.getlist('platform'):
+        missing.append('Platform')
     if missing:
         return f"Field wajib diisi: {', '.join(missing)}."
     if not parse_date(form_text('deadline')):
@@ -231,6 +259,25 @@ def distinct_values(column):
         column != ''
     ).distinct().order_by(column.asc()).all()
     return [row[0] for row in rows]
+
+
+def distinct_platform_options():
+    values = set(PLATFORM_OPTIONS)
+    for raw_value in distinct_values(Konten.platform):
+        for platform in raw_value.split(', '):
+            platform = platform.strip()
+            if platform:
+                values.add(platform)
+    return sorted(values)
+
+
+def platform_match_condition(platform):
+    return or_(
+        Konten.platform == platform,
+        Konten.platform.like(f'{platform}, %'),
+        Konten.platform.like(f'%, {platform}, %'),
+        Konten.platform.like(f'%, {platform}')
+    )
 
 
 def ensure_tracker_columns():
@@ -406,18 +453,38 @@ def login():
 @app.route('/dashboard')
 @login_required
 def dashboard():
+    from collections import defaultdict
     page = request.args.get('page', 1, type=int)
     konten_list = ordered_tracker_query().paginate(page=page, per_page=25)
     total_konten = Konten.query.filter_by(user_id=current_user.id).count()
     due_soon_count = due_soon_query().count()
     done_count = Konten.query.filter_by(user_id=current_user.id, status='DONE').count()
-    
+
+    monthly_buckets = defaultdict(lambda: {'count': 0, 'total': 0})
+    paid_items = Konten.query.filter_by(user_id=current_user.id, payment='Paid').all()
+    for k in paid_items:
+        ref = k.deadline or (k.created_at.date() if k.created_at else date.today())
+        key = ref.strftime('%Y-%m')
+        monthly_buckets[key]['count'] += 1
+        monthly_buckets[key]['total'] += parse_fee(k.fee)
+    sorted_keys = sorted(monthly_buckets.keys(), reverse=True)[:6]
+    monthly_income = [
+        {
+            'key': m,
+            'label': datetime.strptime(m, '%Y-%m').strftime('%B %Y'),
+            'count': monthly_buckets[m]['count'],
+            'total': monthly_buckets[m]['total'],
+        }
+        for m in sorted_keys
+    ]
+
     return render_template(
         'dashboard.html',
         konten_list=konten_list,
         total_konten=total_konten,
         due_soon_count=due_soon_count,
-        done_count=done_count
+        done_count=done_count,
+        monthly_income=monthly_income
     )
 
 
@@ -475,7 +542,7 @@ def report():
         'category': request.args.get('category', '').strip(),
         'brand': request.args.get('brand', '').strip(),
         'payment': request.args.get('payment', '').strip(),
-        'platform': request.args.get('platform', '').strip(),
+        'platform': [item.strip() for item in request.args.getlist('platform') if item.strip()],
         'status': request.args.get('status', '').strip()
     }
 
@@ -492,7 +559,8 @@ def report():
     if filters['payment']:
         query = query.filter(Konten.payment == filters['payment'])
     if filters['platform']:
-        query = query.filter(Konten.platform == filters['platform'])
+        platform_conditions = [platform_match_condition(platform) for platform in filters['platform']]
+        query = query.filter(or_(*platform_conditions))
     if filters['status']:
         query = query.filter(Konten.status == filters['status'])
 
@@ -501,7 +569,7 @@ def report():
     report_options.update({
         'brand_options': distinct_values(Konten.brand),
         'category_options': sorted(set(CATEGORY_OPTIONS + distinct_values(Konten.category))),
-        'platform_options': sorted(set(PLATFORM_OPTIONS + distinct_values(Konten.platform)))
+        'platform_options': distinct_platform_options()
     })
 
     return render_template(
@@ -675,6 +743,104 @@ def drive_upload():
 @login_required
 def profile():
     return render_template('profile.html', user=current_user)
+
+
+@app.route('/pengeluaran')
+@login_required
+def pengeluaran():
+    from collections import defaultdict
+    items = Pengeluaran.query.filter_by(user_id=current_user.id).order_by(
+        Pengeluaran.tanggal.desc()
+    ).all()
+    monthly_buckets = defaultdict(lambda: {'count': 0, 'total': 0})
+    for item in items:
+        key = item.tanggal.strftime('%Y-%m')
+        monthly_buckets[key]['count'] += 1
+        monthly_buckets[key]['total'] += item.jumlah
+    sorted_keys = sorted(monthly_buckets.keys(), reverse=True)[:6]
+    monthly_expense = [
+        {
+            'key': k,
+            'label': datetime.strptime(k, '%Y-%m').strftime('%B %Y'),
+            'count': monthly_buckets[k]['count'],
+            'total': monthly_buckets[k]['total'],
+        }
+        for k in sorted_keys
+    ]
+    total_all = sum(item.jumlah for item in items)
+    return render_template('pengeluaran.html',
+        items=items,
+        monthly_expense=monthly_expense,
+        total_all=total_all,
+        category_options=EXPENSE_CATEGORY_OPTIONS
+    )
+
+
+@app.route('/pengeluaran/buat', methods=['GET', 'POST'])
+@login_required
+def buat_pengeluaran():
+    if request.method == 'POST':
+        tanggal = parse_date((request.form.get('tanggal') or '').strip())
+        kategori = (request.form.get('kategori') or '').strip()
+        deskripsi = (request.form.get('deskripsi') or '').strip()
+        jumlah_str = re.sub(r'[^\d]', '', request.form.get('jumlah', ''))
+        jumlah = int(jumlah_str) if jumlah_str else 0
+        if not tanggal or not kategori or jumlah <= 0:
+            flash('Tanggal, kategori, dan jumlah wajib diisi.', 'danger')
+            return redirect(url_for('buat_pengeluaran'))
+        item = Pengeluaran(tanggal=tanggal, kategori=kategori,
+                           deskripsi=deskripsi, jumlah=jumlah,
+                           user_id=current_user.id)
+        db.session.add(item)
+        db.session.commit()
+        flash('Pengeluaran berhasil ditambahkan!', 'success')
+        return redirect(url_for('pengeluaran'))
+    return render_template('buat_pengeluaran.html',
+        category_options=EXPENSE_CATEGORY_OPTIONS,
+        today=date.today().isoformat()
+    )
+
+
+@app.route('/pengeluaran/<int:id>/edit', methods=['GET', 'POST'])
+@login_required
+def edit_pengeluaran(id):
+    item = Pengeluaran.query.get_or_404(id)
+    if item.user_id != current_user.id:
+        flash('Tidak ada akses.', 'danger')
+        return redirect(url_for('pengeluaran'))
+    if request.method == 'POST':
+        tanggal = parse_date((request.form.get('tanggal') or '').strip())
+        kategori = (request.form.get('kategori') or '').strip()
+        deskripsi = (request.form.get('deskripsi') or '').strip()
+        jumlah_str = re.sub(r'[^\d]', '', request.form.get('jumlah', ''))
+        jumlah = int(jumlah_str) if jumlah_str else 0
+        if not tanggal or not kategori or jumlah <= 0:
+            flash('Tanggal, kategori, dan jumlah wajib diisi.', 'danger')
+            return redirect(url_for('edit_pengeluaran', id=id))
+        item.tanggal = tanggal
+        item.kategori = kategori
+        item.deskripsi = deskripsi
+        item.jumlah = jumlah
+        db.session.commit()
+        flash('Pengeluaran berhasil diperbarui!', 'success')
+        return redirect(url_for('pengeluaran'))
+    return render_template('edit_pengeluaran.html',
+        item=item,
+        category_options=EXPENSE_CATEGORY_OPTIONS
+    )
+
+
+@app.route('/pengeluaran/<int:id>/delete', methods=['POST'])
+@login_required
+def delete_pengeluaran(id):
+    item = Pengeluaran.query.get_or_404(id)
+    if item.user_id != current_user.id:
+        flash('Tidak ada akses.', 'danger')
+        return redirect(url_for('pengeluaran'))
+    db.session.delete(item)
+    db.session.commit()
+    flash('Pengeluaran berhasil dihapus!', 'success')
+    return redirect(url_for('pengeluaran'))
 
 
 def init_db():

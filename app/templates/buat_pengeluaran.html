@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}Tambah Pengeluaran — Marianne Tracker{% endblock %}
+
+{% block content %}
+<div class="form-container tracker-form-container">
+    <div class="form-heading">
+        <span class="eyebrow">💸 Pengeluaran Baru</span>
+        <h2>Tambah Pengeluaran</h2>
+    </div>
+
+    <form method="POST" class="tracker-form">
+        <div class="form-grid">
+
+            <div class="form-group-full">
+                <label for="tanggal">Tanggal 📅</label>
+                <input type="text" id="tanggal" name="tanggal"
+                       class="datepicker" value="{{ today }}"
+                       placeholder="Pilih tanggal..." required>
+            </div>
+
+            <div class="form-group-full">
+                <label for="kategori">Kategori 🏷️</label>
+                <select id="kategori" name="kategori" required>
+                    <option value="">— Pilih kategori —</option>
+                    {% for option in category_options %}
+                        <option value="{{ option }}">{{ option }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group-full wide-field">
+                <label for="deskripsi">Deskripsi 📝</label>
+                <input type="text" id="deskripsi" name="deskripsi"
+                       placeholder="Keterangan pengeluaran...">
+            </div>
+
+            <div class="form-group-full">
+                <label for="jumlah">Jumlah (Rp) 💰</label>
+                <input type="text" id="jumlah" name="jumlah"
+                       placeholder="500000" required>
+            </div>
+
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-success">💾 Simpan</button>
+            <a href="{{ url_for('pengeluaran') }}" class="btn btn-secondary">Batal</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

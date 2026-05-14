@@ -78,13 +78,22 @@
 
             <!-- Platform -->
             <div class="form-group-full">
-                <label for="platform">📱 Platform</label>
-                <select id="platform" name="platform">
-                    <option value="">Semua Platform</option>
+                <label>📱 Platform <span class="field-hint">Bisa pilih lebih dari 1</span></label>
+                <div class="multi-select" data-multi-select data-placeholder="Semua Platform">
+                    <button type="button" class="multi-select-trigger" data-multi-select-trigger aria-expanded="false">
+                        <span class="multi-select-summary" data-multi-select-label>Semua Platform</span>
+                        <span class="multi-select-caret">⌄</span>
+                    </button>
+                    <div class="multi-select-menu" data-multi-select-menu>
                     {% for option in platform_options %}
-                        <option value="{{ option }}" {% if filters.platform == option %}selected{% endif %}>{{ option }}</option>
+                        <label class="multi-select-option">
+                            <input type="checkbox" name="platform" value="{{ option }}"
+                                   {% if option in filters.platform %}checked{% endif %}>
+                            <span>{{ option }}</span>
+                        </label>
                     {% endfor %}
-                </select>
+                    </div>
+                </div>
             </div>
 
             <!-- Status -->
@@ -170,7 +179,11 @@
                         <td data-label="Fee">{{ k.fee or '-' }}</td>
                         <td data-label="SOW" class="truncate-cell">{{ k.sow or '-' }}</td>
                         <td data-label="Platform">
-                            <span class="data-pill platform-pill">{{ k.platform or '-' }}</span>
+                            <div class="platform-pills">
+                            {% for p in (k.platform or '-').split(', ') %}
+                                <span class="data-pill platform-pill">{{ p }}</span>
+                            {% endfor %}
+                            </div>
                         </td>
                         <td data-label="Status">
                             <span class="status-badge status-{{ status_class }}">{{ k.status or '-' }}</span>

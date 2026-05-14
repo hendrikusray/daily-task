@@ -41,6 +41,40 @@
         </div>
     </section>
 
+    <!-- Monthly Income Summary -->
+    {% if monthly_income %}
+    <section class="monthly-income-section">
+        <div class="sheet-card">
+            <div class="sheet-toolbar">
+                <div>
+                    <span class="eyebrow">💰 Pendapatan</span>
+                    <h2>Income Bulanan (Paid)</h2>
+                </div>
+            </div>
+            <div class="tracker-table-wrap">
+                <table class="tracker-table monthly-table">
+                    <thead>
+                        <tr>
+                            <th>Bulan</th>
+                            <th>Jumlah Campaign</th>
+                            <th>Total Fee</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in monthly_income %}
+                        <tr {% if loop.first %}class="monthly-row-current"{% endif %}>
+                            <td data-label="Bulan"><strong>{{ row.label }}</strong></td>
+                            <td data-label="Jumlah Campaign">{{ row.count }} campaign</td>
+                            <td data-label="Total Fee" class="monthly-total">{{ row.total | idr }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
     <!-- Table -->
     {% if konten_list.items %}
     <div class="sheet-card">
@@ -111,7 +145,11 @@
                         </td>
                         <td data-label="SOW" class="muted-cell">{{ (k.sow or '-')|truncate(48, True, '…') }}</td>
                         <td data-label="Platform">
-                            <span class="data-pill platform-pill">{{ k.platform or '-' }}</span>
+                            <div class="platform-pills">
+                            {% for p in (k.platform or '-').split(', ') %}
+                                <span class="data-pill platform-pill">{{ p }}</span>
+                            {% endfor %}
+                            </div>
                         </td>
                         <td data-label="Aksi" onclick="event.stopPropagation()">
                             <div class="table-actions">
