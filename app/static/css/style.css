@@ -1149,6 +1149,7 @@ span.flatpickr-weekday { color: var(--lily) !important; font-weight: 800 !import
     .sheet-toolbar { margin-bottom: 12px; padding: 0; border-bottom: none; background: transparent; }
     .deadline-legend { width: 100%; justify-content: center; }
     .tracker-table-wrap { overflow: visible; }
+    .monthly-table-wrap { overflow-x: auto !important; -webkit-overflow-scrolling: touch; }
 
     .tracker-table, .tracker-table tbody, .tracker-table tr, .tracker-table td { display: block; width: 100%; }
     .tracker-table { min-width: 0; border-collapse: separate; border-spacing: 0 12px; background: transparent; }
@@ -3065,7 +3066,6 @@ body[data-theme="polka"].auth-page::after {
 
 /* === MONTHLY INCOME TABLE === */
 .monthly-income-section { margin-bottom: 8px; }
-.monthly-income-section .sheet-card { overflow: hidden; }
 .monthly-table td, .monthly-table th { white-space: normal; }
 .monthly-total { font-weight: 800; color: var(--sage-dark); font-size: 14px; }
 .monthly-row-current td { background: var(--lily-pale) !important; }
@@ -3335,16 +3335,16 @@ body[data-theme="polka"].auth-page::after {
 
 /* === INCOME CHART === */
 .income-chart-wrap {
-    padding: 16px 20px 20px;
-    width: 100%;
-    box-sizing: border-box;
+    padding: 16px 0 20px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
 }
 .income-chart-wrap canvas {
-    width: 100% !important;
-    max-width: 100%;
+    min-width: 480px;
+    display: block;
 }
 @media (max-width: 600px) {
-    .income-chart-wrap { padding: 12px 10px 16px; }
+    .income-chart-wrap { padding: 12px 0 16px; }
 }
 
 /* === PENGELUARAN PAGE === */
