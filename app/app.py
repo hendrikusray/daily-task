@@ -61,11 +61,10 @@ STATUS_OPTIONS = [
     'Waiting product arrival',
     "Waiting client's payment",
     'DONE',
-    'Transfer'
 ]
-FINISHED_STATUS_OPTIONS = ['DONE', 'Transfer']
+FINISHED_STATUS_OPTIONS = ['DONE']
 FINISHED_STATUS_VALUES = {status.upper() for status in FINISHED_STATUS_OPTIONS}
-INCOME_STATUS = 'Transfer'
+INCOME_STATUS = 'DONE'
 EXPENSE_CATEGORY_OPTIONS = ['Editor', 'Asisten', 'Transport', 'Peralatan', 'Software', 'Lain-lain']
 MONTH_LABELS_ID = [
     'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
