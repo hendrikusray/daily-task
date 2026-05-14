@@ -1149,7 +1149,6 @@ span.flatpickr-weekday { color: var(--lily) !important; font-weight: 800 !import
     .sheet-toolbar { margin-bottom: 12px; padding: 0; border-bottom: none; background: transparent; }
     .deadline-legend { width: 100%; justify-content: center; }
     .tracker-table-wrap { overflow: visible; }
-    .monthly-table-wrap { overflow-x: auto !important; -webkit-overflow-scrolling: touch; }
 
     .tracker-table, .tracker-table tbody, .tracker-table tr, .tracker-table td { display: block; width: 100%; }
     .tracker-table { min-width: 0; border-collapse: separate; border-spacing: 0 12px; background: transparent; }
@@ -3335,16 +3334,12 @@ body[data-theme="polka"].auth-page::after {
 
 /* === INCOME CHART === */
 .income-chart-wrap {
-    padding: 16px 0 20px;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-}
-.income-chart-wrap canvas {
-    min-width: 480px;
-    display: block;
+    position: relative;
+    height: 280px;
+    padding: 16px 20px 20px;
 }
 @media (max-width: 600px) {
-    .income-chart-wrap { padding: 12px 0 16px; }
+    .income-chart-wrap { height: 200px; padding: 12px 10px 16px; }
 }
 
 /* === PENGELUARAN PAGE === */
