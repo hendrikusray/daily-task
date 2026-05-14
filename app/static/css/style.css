@@ -3065,6 +3065,7 @@ body[data-theme="polka"].auth-page::after {
 
 /* === MONTHLY INCOME TABLE === */
 .monthly-income-section { margin-bottom: 8px; }
+.monthly-income-section .sheet-card { overflow: hidden; }
 .monthly-table td, .monthly-table th { white-space: normal; }
 .monthly-total { font-weight: 800; color: var(--sage-dark); font-size: 14px; }
 .monthly-row-current td { background: var(--lily-pale) !important; }
