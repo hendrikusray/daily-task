@@ -65,7 +65,6 @@ html { min-height: 100%; scroll-behavior: smooth; }
 
 body {
     min-height: 100vh;
-    overflow-x: hidden;
     color: var(--ink);
     font-family: 'Nunito', 'Segoe UI', system-ui, sans-serif;
     font-size: 15px;
@@ -1150,6 +1149,8 @@ span.flatpickr-weekday { color: var(--lily) !important; font-weight: 800 !import
     .sheet-toolbar { margin-bottom: 12px; padding: 0; border-bottom: none; background: transparent; }
     .deadline-legend { width: 100%; justify-content: center; }
     .tracker-table-wrap { overflow: visible; }
+    /* Monthly table needs scroll containment — don't inherit overflow:visible */
+    .monthly-table-wrap { overflow-x: auto !important; -webkit-overflow-scrolling: touch; }
 
     .tracker-table, .tracker-table tbody, .tracker-table tr, .tracker-table td { display: block; width: 100%; }
     .tracker-table { min-width: 0; border-collapse: separate; border-spacing: 0 12px; background: transparent; }
@@ -3066,6 +3067,10 @@ body[data-theme="polka"].auth-page::after {
 
 /* === MONTHLY INCOME TABLE === */
 .monthly-income-section { margin-bottom: 8px; }
+/* Keep chart card clipped on mobile when sheet-card loses overflow:hidden */
+@media (max-width: 840px) {
+    .monthly-income-section .sheet-card { overflow: hidden !important; }
+}
 .monthly-table td, .monthly-table th { white-space: nowrap; }
 .monthly-total { font-weight: 800; color: var(--sage-dark); font-size: 14px; }
 .monthly-row-current td { background: var(--lily-pale) !important; }
@@ -3339,7 +3344,9 @@ body[data-theme="polka"].auth-page::after {
     position: relative;
     height: 300px;
     width: 100%;
+    max-width: 100%;
     overflow: hidden;
+    box-sizing: border-box;
 }
 @media (max-width: 600px) {
     .income-chart-wrap { padding: 14px 10px 18px; height: 220px; }
