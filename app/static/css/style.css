@@ -3093,45 +3093,67 @@ body[data-theme="polka"].auth-page::after {
     color: var(--sage-dark); font-size: 11.5px; font-weight: 800;
 }
 
-/* income summary and filter */
-.income-summary-grid {
+/* income summary stat cards */
+.income-stat-grid {
     display: grid;
-    grid-template-columns: 1.25fr 1fr 1fr;
-    gap: 10px;
-    padding: 0 20px 14px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    padding: 20px 22px 18px;
 }
 
-.income-summary-card {
-    display: grid;
+.income-stat-card {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
     gap: 6px;
-    padding: 14px 16px;
-    background: linear-gradient(135deg, var(--surface) 0%, var(--surface-soft) 100%);
-    border: 1.5px solid var(--line-soft);
-    border-radius: 14px;
+    padding: 20px 22px;
+    border-radius: 16px;
+    color: #fff;
 }
-
-.income-summary-card-total {
-    background: linear-gradient(135deg, var(--lily-pale) 0%, var(--surface) 100%);
-    border-color: rgba(168, 43, 92, 0.22);
+.income-stat-card::after {
+    content: "";
+    position: absolute;
+    right: -18px; bottom: -18px;
+    width: 80px; height: 80px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 50%;
 }
+.income-stat-card::before {
+    content: "";
+    position: absolute;
+    right: 14px; bottom: -8px;
+    width: 48px; height: 48px;
+    background: rgba(255,255,255,0.10);
+    border-radius: 50%;
+}
+.income-stat-card > * { position: relative; z-index: 1; }
 
-.income-summary-card > span {
-    color: var(--muted);
-    font-size: 11px;
-    font-weight: 900;
-    letter-spacing: 0.06em;
+.income-stat-lily  { background: var(--grad-primary); }
+.income-stat-gold  { background: var(--grad-gold); }
+.income-stat-sage  { background: var(--grad-sage); }
+
+.income-stat-icon  { font-size: 22px; line-height: 1; }
+.income-stat-label {
+    font-size: 12px;
+    font-weight: 700;
+    opacity: 0.85;
+    letter-spacing: 0.04em;
     text-transform: uppercase;
 }
-
-.income-summary-card strong {
-    color: var(--ink);
-    font-size: 18px;
+.income-stat-value {
+    font-size: 28px;
     font-weight: 900;
-    line-height: 1.15;
+    line-height: 1.1;
 }
 
-.income-summary-card-total strong {
-    color: var(--lily-dark);
+@media (max-width: 720px) {
+    .income-stat-grid {
+        grid-template-columns: 1fr;
+        padding: 14px 16px;
+        gap: 10px;
+    }
+    .income-stat-value { font-size: 24px; }
 }
 
 .income-filter-bar {
@@ -3185,11 +3207,6 @@ body[data-theme="polka"].auth-page::after {
 }
 
 @media (max-width: 720px) {
-    .income-summary-grid {
-        grid-template-columns: 1fr;
-        padding: 0 0 12px;
-    }
-
     .income-filter-bar {
         padding: 12px 0;
     }

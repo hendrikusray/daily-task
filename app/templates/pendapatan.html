@@ -32,18 +32,21 @@
                 </div>
             </div>
 
-            <div class="income-summary-grid">
-                <div class="income-summary-card income-summary-card-total">
-                    <span>Total Pendapatan Seluruhnya</span>
-                    <strong>{{ total_income | idr }}</strong>
+            <div class="income-stat-grid">
+                <div class="income-stat-card income-stat-lily">
+                    <div class="income-stat-icon">💰</div>
+                    <div class="income-stat-label">Total Pendapatan</div>
+                    <div class="income-stat-value">{{ total_income | idr }}</div>
                 </div>
-                <div class="income-summary-card">
-                    <span>Total Sesuai Filter</span>
-                    <strong id="incomeFilteredTotal">{{ total_income | idr }}</strong>
+                <div class="income-stat-card income-stat-gold">
+                    <div class="income-stat-icon">🔍</div>
+                    <div class="income-stat-label">Sesuai Filter</div>
+                    <div class="income-stat-value" id="incomeFilteredTotal">{{ total_income | idr }}</div>
                 </div>
-                <div class="income-summary-card">
-                    <span>Campaign Transfer</span>
-                    <strong><span id="incomeFilteredCount">{{ income_total_campaigns }}</span> campaign</strong>
+                <div class="income-stat-card income-stat-sage">
+                    <div class="income-stat-icon">✅</div>
+                    <div class="income-stat-label">Campaign Transfer</div>
+                    <div class="income-stat-value"><span id="incomeFilteredCount">{{ income_total_campaigns }}</span></div>
                 </div>
             </div>
 
