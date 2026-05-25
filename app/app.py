@@ -156,6 +156,18 @@ class Pengeluaran(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 
+class Invoice(db.Model):
+    __tablename__ = 'invoice'
+    id = db.Column(db.Integer, primary_key=True)
+    konten_id = db.Column(db.Integer, db.ForeignKey('konten.id', ondelete='CASCADE'), nullable=False, unique=True)
+    invoice_number = db.Column(db.String(20), nullable=False)
+    campaign_number = db.Column(db.String(10), nullable=False)
+    first_downloaded_at = db.Column(db.DateTime, nullable=True)
+    items_json = db.Column(db.Text, nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    konten = db.relationship('Konten', backref=db.backref('invoice', uselist=False))
+
+
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
@@ -563,6 +575,68 @@ def dashboard():
 @login_required
 def pendapatan():
     return render_template('pendapatan.html', **build_income_context(current_user.id))
+
+
+def _next_invoice_number(user_id):
+    year = datetime.now().year
+    count = Invoice.query.join(Konten).filter(
+        Konten.user_id == user_id,
+        Invoice.invoice_number.like(f'INV-{year}-%')
+    ).count()
+    return f'INV-{year}-{count + 1:04d}'
+
+
+def _next_campaign_number(user_id):
+    count = Invoice.query.join(Konten).filter(Konten.user_id == user_id).count()
+    return f'{count + 1:04d}'
+
+
+def _default_invoice_items(konten):
+    rate = parse_fee(konten.fee) if is_finished_status(konten.status) else 0
+    return [{'sow': konten.sow or '', 'platform': konten.platform or '', 'qty': 1, 'rate': rate}]
+
+
+@app.route('/invoice/<int:konten_id>', methods=['GET'])
+@login_required
+def show_invoice(konten_id):
+    k = Konten.query.filter_by(id=konten_id, user_id=current_user.id).first_or_404()
+    inv = Invoice.query.filter_by(konten_id=konten_id).first()
+    if not inv:
+        inv = Invoice(
+            konten_id=konten_id,
+            invoice_number=_next_invoice_number(current_user.id),
+            campaign_number=_next_campaign_number(current_user.id)
+        )
+        db.session.add(inv)
+        db.session.commit()
+    items = _json.loads(inv.items_json) if inv.items_json else _default_invoice_items(k)
+    return render_template('invoice.html', konten=k, invoice=inv, items=items,
+                           creator_name=current_user.username.replace('.', ' ').title())
+
+
+@app.route('/invoice/<int:konten_id>/save', methods=['POST'])
+@login_required
+def save_invoice(konten_id):
+    k = Konten.query.filter_by(id=konten_id, user_id=current_user.id).first_or_404()
+    inv = Invoice.query.filter_by(konten_id=konten_id).first_or_404()
+    sows = request.form.getlist('sow[]')
+    platforms = request.form.getlist('platform[]')
+    qtys = request.form.getlist('qty[]')
+    rates = request.form.getlist('rate[]')
+    items = []
+    for i in range(len(sows)):
+        raw_rate = rates[i] if i < len(rates) else '0'
+        items.append({
+            'sow': sows[i] if i < len(sows) else '',
+            'platform': platforms[i] if i < len(platforms) else '',
+            'qty': max(1, int(qtys[i])) if i < len(qtys) and qtys[i].isdigit() else 1,
+            'rate': int(re.sub(r'[^\d]', '', raw_rate)) if raw_rate else 0
+        })
+    inv.items_json = _json.dumps(items)
+    if not inv.first_downloaded_at:
+        inv.first_downloaded_at = datetime.utcnow()
+    db.session.commit()
+    return jsonify({'ok': True})
 
 
 @app.route('/konten/buat', methods=['GET', 'POST'])
