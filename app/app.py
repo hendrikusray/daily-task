@@ -103,6 +103,7 @@ class Konten(db.Model):
     payment = db.Column(db.String(40), nullable=True)
     fee = db.Column(db.String(80), nullable=True)
     sow = db.Column(db.String(200), nullable=True)
+    sow_items = db.Column(db.Text, nullable=True)  # JSON: [{text, platform, qty}]
     platform = db.Column(db.String(120), nullable=True)
     status = db.Column(db.String(80), nullable=True)
     deadline = db.Column(db.Date, nullable=True)
@@ -205,6 +206,16 @@ def idr_filter(amount):
     return 'Rp ' + f'{int(amount):,}'.replace(',', '.')
 
 
+@app.template_filter('fromjson')
+def fromjson_filter(s):
+    if not s:
+        return []
+    try:
+        return _json.loads(s)
+    except Exception:
+        return []
+
+
 @app.template_filter('status_label')
 def status_label_filter(status):
     if not status:
@@ -224,9 +235,23 @@ def apply_tracker_form(konten):
     konten.campaign_project = form_text('campaign_project')
     konten.payment = form_text('payment')
     konten.fee = form_text('fee')
-    konten.sow = form_text('sow')
-    platforms = request.form.getlist('platform')
-    konten.platform = ', '.join(platforms) if platforms else ''
+    sow_texts = request.form.getlist('sow_item_text[]')
+    sow_platforms = request.form.getlist('sow_item_platform[]')
+    sow_qtys = request.form.getlist('sow_item_qty[]')
+    items = []
+    for i in range(len(sow_texts)):
+        t = sow_texts[i].strip() if i < len(sow_texts) else ''
+        p = sow_platforms[i].strip() if i < len(sow_platforms) else ''
+        q = int(sow_qtys[i]) if i < len(sow_qtys) and sow_qtys[i].isdigit() else 1
+        if t or p:
+            items.append({'text': t, 'platform': p, 'qty': max(1, q)})
+    konten.sow_items = _json.dumps(items) if items else None
+    konten.sow = items[0]['text'] if items else ''
+    seen = []
+    for it in items:
+        if it['platform'] and it['platform'] not in seen:
+            seen.append(it['platform'])
+    konten.platform = ', '.join(seen) if seen else ''
     konten.status = form_text('status')
     konten.deadline = parse_date(form_text('deadline'))
     konten.product_knowledge = form_text('product_knowledge')
@@ -250,8 +275,8 @@ def validate_tracker_form():
         'deadline': 'Deadline'
     }
     missing = [label for field, label in required_fields.items() if not form_text(field)]
-    if not request.form.getlist('platform'):
-        missing.append('Platform')
+    if not any(t.strip() for t in request.form.getlist('sow_item_text[]')):
+        missing.append('SOW')
     if missing:
         return f"Field wajib diisi: {', '.join(missing)}."
     if not parse_date(form_text('deadline')):
@@ -366,6 +391,7 @@ def ensure_tracker_columns():
         'payment': 'ALTER TABLE konten ADD COLUMN payment VARCHAR(40)',
         'fee': 'ALTER TABLE konten ADD COLUMN fee VARCHAR(80)',
         'sow': 'ALTER TABLE konten ADD COLUMN sow VARCHAR(200)',
+        'sow_items': 'ALTER TABLE konten ADD COLUMN sow_items TEXT',
         'platform': 'ALTER TABLE konten ADD COLUMN platform VARCHAR(120)',
         'status': 'ALTER TABLE konten ADD COLUMN status VARCHAR(80)',
         'deadline': 'ALTER TABLE konten ADD COLUMN deadline DATE',
@@ -591,9 +617,13 @@ def _next_campaign_number(user_id):
     return f'{count + 1:04d}'
 
 
-def _default_invoice_items(konten):
+def _invoice_items_from_konten(konten):
     rate = parse_fee(konten.fee) if is_finished_status(konten.status) else 0
-    return [{'sow': konten.sow or '', 'platform': konten.platform or '', 'qty': 1, 'rate': rate}]
+    if konten.sow_items:
+        raw = _json.loads(konten.sow_items)
+        return [{'text': it.get('text', ''), 'platform': it.get('platform', ''),
+                 'qty': it.get('qty', 1), 'rate': rate} for it in raw]
+    return [{'text': konten.sow or '', 'platform': konten.platform or '', 'qty': 1, 'rate': rate}]
 
 
 @app.route('/invoice/<int:konten_id>', methods=['GET'])
@@ -605,38 +635,17 @@ def show_invoice(konten_id):
         inv = Invoice(
             konten_id=konten_id,
             invoice_number=_next_invoice_number(current_user.id),
-            campaign_number=_next_campaign_number(current_user.id)
+            campaign_number=_next_campaign_number(current_user.id),
+            first_downloaded_at=datetime.utcnow()
         )
         db.session.add(inv)
         db.session.commit()
-    items = _json.loads(inv.items_json) if inv.items_json else _default_invoice_items(k)
+    elif not inv.first_downloaded_at:
+        inv.first_downloaded_at = datetime.utcnow()
+        db.session.commit()
+    items = _invoice_items_from_konten(k)
     return render_template('invoice.html', konten=k, invoice=inv, items=items,
                            creator_name=current_user.username.replace('.', ' ').title())
-
-
-@app.route('/invoice/<int:konten_id>/save', methods=['POST'])
-@login_required
-def save_invoice(konten_id):
-    k = Konten.query.filter_by(id=konten_id, user_id=current_user.id).first_or_404()
-    inv = Invoice.query.filter_by(konten_id=konten_id).first_or_404()
-    sows = request.form.getlist('sow[]')
-    platforms = request.form.getlist('platform[]')
-    qtys = request.form.getlist('qty[]')
-    rates = request.form.getlist('rate[]')
-    items = []
-    for i in range(len(sows)):
-        raw_rate = rates[i] if i < len(rates) else '0'
-        items.append({
-            'sow': sows[i] if i < len(sows) else '',
-            'platform': platforms[i] if i < len(platforms) else '',
-            'qty': max(1, int(qtys[i])) if i < len(qtys) and qtys[i].isdigit() else 1,
-            'rate': int(re.sub(r'[^\d]', '', raw_rate)) if raw_rate else 0
-        })
-    inv.items_json = _json.dumps(items)
-    if not inv.first_downloaded_at:
-        inv.first_downloaded_at = datetime.utcnow()
-    db.session.commit()
-    return jsonify({'ok': True})
 
 
 @app.route('/konten/buat', methods=['GET', 'POST'])

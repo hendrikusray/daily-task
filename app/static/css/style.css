@@ -3377,6 +3377,45 @@ body[data-theme="polka"].auth-page::after {
 }
 .expense-amount { font-weight: 800; font-size: 13.5px; color: var(--gold-dark); white-space: nowrap; }
 
+/* ── SOW dynamic rows ── */
+.sow-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; }
+.sow-row {
+    display: flex; align-items: center; gap: 8px; flex-wrap: nowrap;
+    background: var(--surface-soft); border: 1px solid var(--line-soft);
+    border-radius: 10px; padding: 8px 10px;
+}
+.sow-text {
+    flex: 1 1 0; min-width: 0;
+    border: none; background: transparent; font-size: 14px;
+    font-family: inherit; color: var(--ink); padding: 4px 6px; border-radius: 6px;
+}
+.sow-text:focus { outline: 2px solid var(--lily-glow); background: #fff; }
+.sow-platform {
+    flex: 0 0 140px; font-size: 13px; border: 1px solid var(--line);
+    border-radius: 8px; padding: 5px 8px; background: #fff; color: var(--ink); font-family: inherit;
+}
+.sow-qty {
+    flex: 0 0 58px; text-align: center; border: 1px solid var(--line);
+    border-radius: 8px; padding: 5px 6px; font-size: 13px; font-family: inherit; background: #fff;
+}
+.sow-del-btn {
+    flex: 0 0 auto; background: none; border: none; color: var(--muted);
+    cursor: pointer; font-size: 15px; padding: 4px 6px; border-radius: 6px; line-height: 1;
+}
+.sow-del-btn:hover { background: var(--lily-pale); color: var(--lily); }
+.sow-add-btn {
+    background: none; border: 1.5px dashed var(--lily-light); color: var(--lily);
+    padding: 6px 14px; border-radius: 8px; cursor: pointer; font-size: 13px; font-family: inherit;
+}
+.sow-add-btn:hover { background: var(--lily-pale); }
+
+@media (max-width: 600px) {
+    .sow-row { flex-wrap: wrap; }
+    .sow-text { flex: 1 1 100%; }
+    .sow-platform { flex: 1 1 calc(50% - 4px); }
+    .sow-qty { flex: 0 0 60px; }
+}
+
 /* Floral mobile: keep the flower as a soft corner accent, not a full card pattern */
 @media (max-width: 840px) {
     [data-theme="floral"] .stat-card::after {

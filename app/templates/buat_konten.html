@@ -54,25 +54,6 @@
             </div>
 
             <div class="form-group-full">
-                <label>Platform 📱</label>
-                <div class="multi-select" data-multi-select data-placeholder="Pilih platform">
-                    <button type="button" class="multi-select-trigger" data-multi-select-trigger aria-expanded="false">
-                        <span class="multi-select-summary" data-multi-select-label>Pilih platform</span>
-                        <span class="multi-select-count" data-multi-select-count hidden>0</span>
-                        <span class="multi-select-caret" aria-hidden="true">⌄</span>
-                    </button>
-                    <div class="multi-select-menu" data-multi-select-menu>
-                    {% for option in platform_options %}
-                        <label class="multi-select-option">
-                            <input type="checkbox" name="platform" value="{{ option }}">
-                            <span>{{ option }}</span>
-                        </label>
-                    {% endfor %}
-                    </div>
-                </div>
-            </div>
-
-            <div class="form-group-full">
                 <label for="status">Status 🔖</label>
                 <select id="status" name="status" required>
                     <option value="">— Pilih status —</option>
@@ -90,8 +71,21 @@
             </div>
 
             <div class="form-group-full wide-field">
-                <label for="sow">SOW (Scope of Work) 📝</label>
-                <input type="text" id="sow" name="sow" placeholder="Deskripsi pekerjaan...">
+                <label>SOW &amp; Platform 📝</label>
+                <div id="sowList" class="sow-list">
+                    <div class="sow-row">
+                        <input type="text" name="sow_item_text[]" class="sow-text" placeholder="Deskripsi pekerjaan...">
+                        <select name="sow_item_platform[]" class="sow-platform">
+                            <option value="">Platform</option>
+                            {% for option in platform_options %}
+                            <option value="{{ option }}">{{ option }}</option>
+                            {% endfor %}
+                        </select>
+                        <input type="number" name="sow_item_qty[]" class="sow-qty" value="1" min="1" placeholder="Qty">
+                        <button type="button" class="sow-del-btn" onclick="delSowRow(this)" title="Hapus">✕</button>
+                    </div>
+                </div>
+                <button type="button" class="sow-add-btn" onclick="addSowRow()">+ Tambah SOW</button>
             </div>
 
             <div class="form-group-full wide-field">
@@ -150,4 +144,31 @@
         </div>
     </form>
 </div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+var _platformOptions = {{ platform_options | tojson }};
+
+function sowRowHtml(text, platform, qty) {
+    var opts = _platformOptions.map(function(o) {
+        return '<option value="' + o + '"' + (o === platform ? ' selected' : '') + '>' + o + '</option>';
+    }).join('');
+    return '<div class="sow-row">' +
+        '<input type="text" name="sow_item_text[]" class="sow-text" placeholder="Deskripsi pekerjaan..." value="' + (text||'') + '">' +
+        '<select name="sow_item_platform[]" class="sow-platform"><option value="">Platform</option>' + opts + '</select>' +
+        '<input type="number" name="sow_item_qty[]" class="sow-qty" value="' + (qty||1) + '" min="1" placeholder="Qty">' +
+        '<button type="button" class="sow-del-btn" onclick="delSowRow(this)" title="Hapus">✕</button>' +
+        '</div>';
+}
+
+function addSowRow() {
+    document.getElementById('sowList').insertAdjacentHTML('beforeend', sowRowHtml('', '', 1));
+}
+
+function delSowRow(btn) {
+    var list = document.getElementById('sowList');
+    if (list.querySelectorAll('.sow-row').length > 1) btn.closest('.sow-row').remove();
+}
+</script>
 {% endblock %}
