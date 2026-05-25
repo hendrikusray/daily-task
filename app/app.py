@@ -698,15 +698,47 @@ def invoice_pdf(konten_id):
     items = _invoice_items_from_konten(k)
     creator_name = current_user.username.replace('.', ' ').title()
 
-    fish_path = os.path.join(app.static_folder, 'images', 'image.png')
-    with open(fish_path, 'rb') as _f:
-        fish_b64 = 'data:image/png;base64,' + base64.b64encode(_f.read()).decode()
+    # Prefer pre-encoded txt (committed to git); fall back to encoding the PNG
+    _fish_txt = os.path.join(app.static_folder, 'images', 'fish_b64.txt')
+    _fish_png = os.path.join(app.static_folder, 'images', 'image.png')
+    if os.path.exists(_fish_txt):
+        with open(_fish_txt, 'r') as _f:
+            fish_b64 = _f.read().strip()
+    elif os.path.exists(_fish_png):
+        with open(_fish_png, 'rb') as _f:
+            fish_b64 = 'data:image/png;base64,' + base64.b64encode(_f.read()).decode()
+    else:
+        fish_b64 = ''
 
     html_str = render_template('invoice_print.html',
         invoice=inv, konten=k, items=items,
         creator_name=creator_name, fish_b64=fish_b64)
 
-    pdf_bytes = WeasyHTML(string=html_str).write_pdf()
+    from weasyprint import CSS as WeasyCSS
+
+    # Pass 1: measure natural content height with an oversized page
+    _measure_css = WeasyCSS(string='@page { size: 210mm 5000mm; margin: 0; }')
+    _doc = WeasyHTML(string=html_str).render(stylesheets=[_measure_css])
+    _page_box = _doc.pages[0]._page_box
+
+    def _content_height(box):
+        h = 0
+        if hasattr(box, 'position_y') and hasattr(box, 'margin_height'):
+            try:
+                h = max(h, box.position_y + box.margin_height())
+            except Exception:
+                pass
+        for child in getattr(box, 'children', []):
+            h = max(h, _content_height(child))
+        return h
+
+    # Start from page box children (skip the page box itself whose height == page size)
+    _natural_h_px = max((_content_height(c) for c in getattr(_page_box, 'children', [])), default=600)
+    _natural_h_mm = _natural_h_px * 0.2646  # 96dpi → mm
+
+    # Pass 2: render with exact content height — body padding already gives equal fish border on all sides
+    _exact_css = WeasyCSS(string=f'@page {{ size: 210mm {_natural_h_mm:.1f}mm; margin: 0; }}')
+    pdf_bytes = WeasyHTML(string=html_str).write_pdf(stylesheets=[_exact_css])
     return Response(
         pdf_bytes,
         mimetype='application/pdf',
