@@ -84,12 +84,18 @@
                         {% set item_platforms = item.platform.split(', ') if item.platform else [] %}
                         <div class="sow-row">
                             <textarea name="sow_item_text[]" class="sow-text" rows="3" placeholder="Deskripsi pekerjaan...">{{ item.text }}</textarea>
-                            <div class="sow-platform-wrap">
-                                {% for option in platform_options %}
-                                <label class="sow-plat-opt">
-                                    <input type="checkbox" class="sow-plat-cb" value="{{ option }}" {% if option in item_platforms %}checked{% endif %}> {{ option }}
-                                </label>
-                                {% endfor %}
+                            <div class="sow-platform-drop" data-sow-drop>
+                                <button type="button" class="sow-drop-trigger" onclick="toggleSowDrop(this)">
+                                    <span class="sow-drop-label">{% if item_platforms and item_platforms[0] %}{{ item_platforms | length }} platform{% else %}Pilih platform{% endif %}</span>
+                                    <span class="sow-drop-caret">⌄</span>
+                                </button>
+                                <div class="sow-drop-menu" hidden>
+                                    {% for option in platform_options %}
+                                    <label class="sow-plat-opt">
+                                        <input type="checkbox" class="sow-plat-cb" value="{{ option }}" {% if option in item_platforms %}checked{% endif %} onchange="updateSowDrop(this)"> {{ option }}
+                                    </label>
+                                    {% endfor %}
+                                </div>
                                 <input type="hidden" name="sow_item_platform[]" class="sow-platform-val">
                             </div>
                             <button type="button" class="sow-del-btn" onclick="delSowRow(this)" title="Hapus">✕</button>
@@ -99,12 +105,18 @@
                         {% set legacy_platforms = (konten.platform or '').split(', ') %}
                         <div class="sow-row">
                             <textarea name="sow_item_text[]" class="sow-text" rows="3" placeholder="Deskripsi pekerjaan...">{{ konten.sow or '' }}</textarea>
-                            <div class="sow-platform-wrap">
-                                {% for option in platform_options %}
-                                <label class="sow-plat-opt">
-                                    <input type="checkbox" class="sow-plat-cb" value="{{ option }}" {% if option in legacy_platforms %}checked{% endif %}> {{ option }}
-                                </label>
-                                {% endfor %}
+                            <div class="sow-platform-drop" data-sow-drop>
+                                <button type="button" class="sow-drop-trigger" onclick="toggleSowDrop(this)">
+                                    <span class="sow-drop-label">{% if konten.platform %}{{ legacy_platforms | length }} platform{% else %}Pilih platform{% endif %}</span>
+                                    <span class="sow-drop-caret">⌄</span>
+                                </button>
+                                <div class="sow-drop-menu" hidden>
+                                    {% for option in platform_options %}
+                                    <label class="sow-plat-opt">
+                                        <input type="checkbox" class="sow-plat-cb" value="{{ option }}" {% if option in legacy_platforms %}checked{% endif %} onchange="updateSowDrop(this)"> {{ option }}
+                                    </label>
+                                    {% endfor %}
+                                </div>
                                 <input type="hidden" name="sow_item_platform[]" class="sow-platform-val">
                             </div>
                             <button type="button" class="sow-del-btn" onclick="delSowRow(this)" title="Hapus">✕</button>
@@ -181,19 +193,24 @@
 
     var _platformOptions = {{ platform_options | tojson }};
 
-    function sowPlatformWrapHtml(checkedArr) {
-        return _platformOptions.map(function(o) {
+    function sowDropHtml(checkedArr) {
+        var items = _platformOptions.map(function(o) {
             var chk = (checkedArr || []).indexOf(o) > -1 ? ' checked' : '';
-            return '<label class="sow-plat-opt"><input type="checkbox" class="sow-plat-cb" value="' + o + '"' + chk + '> ' + o + '</label>';
-        }).join('') + '<input type="hidden" name="sow_item_platform[]" class="sow-platform-val">';
+            return '<label class="sow-plat-opt"><input type="checkbox" class="sow-plat-cb" value="' + o + '"' + chk + ' onchange="updateSowDrop(this)"> ' + o + '</label>';
+        }).join('');
+        var label = checkedArr && checkedArr.length ? checkedArr.length + ' platform' : 'Pilih platform';
+        return '<div class="sow-platform-drop" data-sow-drop>' +
+            '<button type="button" class="sow-drop-trigger" onclick="toggleSowDrop(this)">' +
+            '<span class="sow-drop-label">' + label + '</span><span class="sow-drop-caret">⌄</span></button>' +
+            '<div class="sow-drop-menu" hidden>' + items + '</div>' +
+            '<input type="hidden" name="sow_item_platform[]" class="sow-platform-val"></div>';
     }
 
     function sowRowHtml(text, checkedPlatforms) {
         return '<div class="sow-row">' +
             '<textarea name="sow_item_text[]" class="sow-text" rows="3" placeholder="Deskripsi pekerjaan...">' + (text || '') + '</textarea>' +
-            '<div class="sow-platform-wrap">' + sowPlatformWrapHtml(checkedPlatforms) + '</div>' +
-            '<button type="button" class="sow-del-btn" onclick="delSowRow(this)" title="Hapus">✕</button>' +
-            '</div>';
+            sowDropHtml(checkedPlatforms) +
+            '<button type="button" class="sow-del-btn" onclick="delSowRow(this)" title="Hapus">✕</button></div>';
     }
 
     function addSowRow() {
@@ -204,6 +221,25 @@
         var list = document.getElementById('sowList');
         if (list.querySelectorAll('.sow-row').length > 1) btn.closest('.sow-row').remove();
     }
+
+    function toggleSowDrop(btn) {
+        var menu = btn.parentElement.querySelector('.sow-drop-menu');
+        var isHidden = menu.hidden;
+        document.querySelectorAll('.sow-drop-menu').forEach(function(m) { m.hidden = true; });
+        menu.hidden = !isHidden;
+    }
+
+    function updateSowDrop(cb) {
+        var drop = cb.closest('.sow-platform-drop');
+        var checked = Array.from(drop.querySelectorAll('.sow-plat-cb:checked')).map(function(c) { return c.value; });
+        drop.querySelector('.sow-drop-label').textContent = checked.length ? checked.length + ' platform' : 'Pilih platform';
+    }
+
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('[data-sow-drop]')) {
+            document.querySelectorAll('.sow-drop-menu').forEach(function(m) { m.hidden = true; });
+        }
+    });
 
     document.querySelector('.tracker-form').addEventListener('submit', function() {
         document.querySelectorAll('.sow-row').forEach(function(row) {

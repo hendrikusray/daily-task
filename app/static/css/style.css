@@ -3399,18 +3399,28 @@ body[data-theme="polka"].auth-page::after {
 }
 .sow-text:focus { outline: none; border-color: var(--lily); box-shadow: 0 0 0 3px var(--lily-glow); }
 
-.sow-platform-wrap {
-    display: flex; flex-direction: column; gap: 4px;
-    border: 1px solid var(--line); border-radius: 8px;
-    background: #fff; padding: 8px 10px; max-height: 180px; overflow-y: auto;
+.sow-platform-drop { position: relative; flex: 0 0 160px; }
+.sow-drop-trigger {
+    width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 6px;
+    border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px;
+    background: #fff; font-size: 13px; font-family: inherit; color: var(--ink);
+    cursor: pointer; text-align: left;
+}
+.sow-drop-trigger:focus { outline: none; border-color: var(--lily); }
+.sow-drop-caret { font-size: 11px; color: var(--muted); flex-shrink: 0; }
+.sow-drop-menu {
+    position: absolute; top: calc(100% + 4px); left: 0; right: 0; z-index: 200;
+    background: #fff; border: 1px solid var(--line); border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.13); padding: 6px;
+    max-height: 220px; overflow-y: auto;
 }
 .sow-plat-opt {
-    display: flex; align-items: center; gap: 6px;
+    display: flex; align-items: center; gap: 8px;
     font-size: 13px; color: var(--ink); cursor: pointer;
-    padding: 3px 4px; border-radius: 6px; white-space: nowrap;
+    padding: 5px 8px; border-radius: 6px; white-space: nowrap;
 }
 .sow-plat-opt:hover { background: var(--lily-pale); }
-.sow-plat-opt input[type="checkbox"] { accent-color: var(--lily); width: 14px; height: 14px; cursor: pointer; }
+.sow-plat-opt input[type="checkbox"] { accent-color: var(--lily); width: 14px; height: 14px; cursor: pointer; flex-shrink: 0; }
 
 .sow-del-btn {
     align-self: start; background: none; border: none; color: var(--muted);
@@ -3426,7 +3436,7 @@ body[data-theme="polka"].auth-page::after {
 
 @media (max-width: 600px) {
     .sow-row { grid-template-columns: 1fr auto; }
-    .sow-platform-wrap { grid-column: 1 / -1; max-height: 130px; }
+    .sow-platform-drop { grid-column: 1 / -1; }
 }
 
 /* Floral mobile: keep the flower as a soft corner accent, not a full card pattern */
