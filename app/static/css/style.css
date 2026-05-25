@@ -3378,31 +3378,46 @@ body[data-theme="polka"].auth-page::after {
 .expense-amount { font-weight: 800; font-size: 13.5px; color: var(--gold-dark); white-space: nowrap; }
 
 /* ── SOW dynamic rows ── */
-.sow-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; }
+.sow-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 10px; }
+
 .sow-row {
-    display: flex; align-items: center; gap: 8px; flex-wrap: nowrap;
-    background: var(--surface-soft); border: 1px solid var(--line-soft);
-    border-radius: 10px; padding: 8px 10px;
+    display: grid;
+    grid-template-columns: 1fr 180px auto;
+    gap: 10px;
+    align-items: start;
+    background: var(--surface-soft);
+    border: 1px solid var(--line-soft);
+    border-radius: 12px;
+    padding: 12px 14px;
 }
+
 .sow-text {
-    flex: 1 1 0; min-width: 0;
-    border: none; background: transparent; font-size: 14px;
-    font-family: inherit; color: var(--ink); padding: 4px 6px; border-radius: 6px;
+    width: 100%; box-sizing: border-box;
+    border: 1px solid var(--line); border-radius: 8px;
+    background: #fff; font-size: 14px; font-family: inherit; color: var(--ink);
+    padding: 8px 10px; resize: vertical; min-height: 80px;
 }
-.sow-text:focus { outline: 2px solid var(--lily-glow); background: #fff; }
-.sow-platform {
-    flex: 0 0 140px; font-size: 13px; border: 1px solid var(--line);
-    border-radius: 8px; padding: 5px 8px; background: #fff; color: var(--ink); font-family: inherit;
+.sow-text:focus { outline: none; border-color: var(--lily); box-shadow: 0 0 0 3px var(--lily-glow); }
+
+.sow-platform-wrap {
+    display: flex; flex-direction: column; gap: 4px;
+    border: 1px solid var(--line); border-radius: 8px;
+    background: #fff; padding: 8px 10px; max-height: 180px; overflow-y: auto;
 }
-.sow-qty {
-    flex: 0 0 58px; text-align: center; border: 1px solid var(--line);
-    border-radius: 8px; padding: 5px 6px; font-size: 13px; font-family: inherit; background: #fff;
+.sow-plat-opt {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 13px; color: var(--ink); cursor: pointer;
+    padding: 3px 4px; border-radius: 6px; white-space: nowrap;
 }
+.sow-plat-opt:hover { background: var(--lily-pale); }
+.sow-plat-opt input[type="checkbox"] { accent-color: var(--lily); width: 14px; height: 14px; cursor: pointer; }
+
 .sow-del-btn {
-    flex: 0 0 auto; background: none; border: none; color: var(--muted);
-    cursor: pointer; font-size: 15px; padding: 4px 6px; border-radius: 6px; line-height: 1;
+    align-self: start; background: none; border: none; color: var(--muted);
+    cursor: pointer; font-size: 16px; padding: 6px 8px; border-radius: 6px; line-height: 1; margin-top: 2px;
 }
 .sow-del-btn:hover { background: var(--lily-pale); color: var(--lily); }
+
 .sow-add-btn {
     background: none; border: 1.5px dashed var(--lily-light); color: var(--lily);
     padding: 6px 14px; border-radius: 8px; cursor: pointer; font-size: 13px; font-family: inherit;
@@ -3410,10 +3425,8 @@ body[data-theme="polka"].auth-page::after {
 .sow-add-btn:hover { background: var(--lily-pale); }
 
 @media (max-width: 600px) {
-    .sow-row { flex-wrap: wrap; }
-    .sow-text { flex: 1 1 100%; }
-    .sow-platform { flex: 1 1 calc(50% - 4px); }
-    .sow-qty { flex: 0 0 60px; }
+    .sow-row { grid-template-columns: 1fr auto; }
+    .sow-platform-wrap { grid-column: 1 / -1; max-height: 130px; }
 }
 
 /* Floral mobile: keep the flower as a soft corner accent, not a full card pattern */

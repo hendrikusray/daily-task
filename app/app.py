@@ -237,14 +237,12 @@ def apply_tracker_form(konten):
     konten.fee = form_text('fee')
     sow_texts = request.form.getlist('sow_item_text[]')
     sow_platforms = request.form.getlist('sow_item_platform[]')
-    sow_qtys = request.form.getlist('sow_item_qty[]')
     items = []
     for i in range(len(sow_texts)):
         t = sow_texts[i].strip() if i < len(sow_texts) else ''
         p = sow_platforms[i].strip() if i < len(sow_platforms) else ''
-        q = int(sow_qtys[i]) if i < len(sow_qtys) and sow_qtys[i].isdigit() else 1
         if t or p:
-            items.append({'text': t, 'platform': p, 'qty': max(1, q)})
+            items.append({'text': t, 'platform': p, 'qty': 1})
     konten.sow_items = _json.dumps(items) if items else None
     konten.sow = items[0]['text'] if items else ''
     seen = []

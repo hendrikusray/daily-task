@@ -74,14 +74,15 @@
                 <label>SOW &amp; Platform 📝</label>
                 <div id="sowList" class="sow-list">
                     <div class="sow-row">
-                        <input type="text" name="sow_item_text[]" class="sow-text" placeholder="Deskripsi pekerjaan...">
-                        <select name="sow_item_platform[]" class="sow-platform">
-                            <option value="">Platform</option>
+                        <textarea name="sow_item_text[]" class="sow-text" rows="3" placeholder="Deskripsi pekerjaan..."></textarea>
+                        <div class="sow-platform-wrap">
                             {% for option in platform_options %}
-                            <option value="{{ option }}">{{ option }}</option>
+                            <label class="sow-plat-opt">
+                                <input type="checkbox" class="sow-plat-cb" value="{{ option }}"> {{ option }}
+                            </label>
                             {% endfor %}
-                        </select>
-                        <input type="number" name="sow_item_qty[]" class="sow-qty" value="1" min="1" placeholder="Qty">
+                            <input type="hidden" name="sow_item_platform[]" class="sow-platform-val">
+                        </div>
                         <button type="button" class="sow-del-btn" onclick="delSowRow(this)" title="Hapus">✕</button>
                     </div>
                 </div>
@@ -150,25 +151,35 @@
 <script>
 var _platformOptions = {{ platform_options | tojson }};
 
-function sowRowHtml(text, platform, qty) {
-    var opts = _platformOptions.map(function(o) {
-        return '<option value="' + o + '"' + (o === platform ? ' selected' : '') + '>' + o + '</option>';
-    }).join('');
+function sowPlatformWrapHtml(checkedArr) {
+    return _platformOptions.map(function(o) {
+        var chk = (checkedArr || []).indexOf(o) > -1 ? ' checked' : '';
+        return '<label class="sow-plat-opt"><input type="checkbox" class="sow-plat-cb" value="' + o + '"' + chk + '> ' + o + '</label>';
+    }).join('') + '<input type="hidden" name="sow_item_platform[]" class="sow-platform-val">';
+}
+
+function sowRowHtml(text, checkedPlatforms) {
     return '<div class="sow-row">' +
-        '<input type="text" name="sow_item_text[]" class="sow-text" placeholder="Deskripsi pekerjaan..." value="' + (text||'') + '">' +
-        '<select name="sow_item_platform[]" class="sow-platform"><option value="">Platform</option>' + opts + '</select>' +
-        '<input type="number" name="sow_item_qty[]" class="sow-qty" value="' + (qty||1) + '" min="1" placeholder="Qty">' +
+        '<textarea name="sow_item_text[]" class="sow-text" rows="3" placeholder="Deskripsi pekerjaan...">' + (text || '') + '</textarea>' +
+        '<div class="sow-platform-wrap">' + sowPlatformWrapHtml(checkedPlatforms) + '</div>' +
         '<button type="button" class="sow-del-btn" onclick="delSowRow(this)" title="Hapus">✕</button>' +
         '</div>';
 }
 
 function addSowRow() {
-    document.getElementById('sowList').insertAdjacentHTML('beforeend', sowRowHtml('', '', 1));
+    document.getElementById('sowList').insertAdjacentHTML('beforeend', sowRowHtml('', []));
 }
 
 function delSowRow(btn) {
     var list = document.getElementById('sowList');
     if (list.querySelectorAll('.sow-row').length > 1) btn.closest('.sow-row').remove();
 }
+
+document.querySelector('.tracker-form').addEventListener('submit', function() {
+    document.querySelectorAll('.sow-row').forEach(function(row) {
+        var checked = Array.from(row.querySelectorAll('.sow-plat-cb:checked')).map(function(cb) { return cb.value; });
+        row.querySelector('.sow-platform-val').value = checked.join(', ');
+    });
+});
 </script>
 {% endblock %}
