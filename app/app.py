@@ -736,9 +736,10 @@ def invoice_pdf(konten_id):
     _natural_h_px = max((_content_height(c) for c in getattr(_page_box, 'children', [])), default=600)
     _natural_h_mm = _natural_h_px * 0.2646  # 96dpi → mm
 
-    # Pass 2: render with exact content height — body padding already gives equal fish border on all sides
+    # Pass 2: render with exact content height — use render() then write_pdf() (more stable API)
+    _natural_h_mm = max(_natural_h_mm, 100)  # guard against 0/negative
     _exact_css = WeasyCSS(string=f'@page {{ size: 210mm {_natural_h_mm:.1f}mm; margin: 0; }}')
-    pdf_bytes = WeasyHTML(string=html_str).write_pdf(stylesheets=[_exact_css])
+    pdf_bytes = WeasyHTML(string=html_str).render(stylesheets=[_exact_css]).write_pdf()
     return Response(
         pdf_bytes,
         mimetype='application/pdf',
