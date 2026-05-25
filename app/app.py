@@ -1,7 +1,8 @@
 import os
 import re
 import uuid
-from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
+import base64
+from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify, Response
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -624,6 +625,35 @@ def _invoice_items_from_konten(konten):
     return [{'text': konten.sow or '', 'platform': konten.platform or '', 'qty': 1, 'rate': rate}]
 
 
+@app.route('/invoice/<int:konten_id>/data', methods=['GET'])
+@login_required
+def invoice_data(konten_id):
+    k = Konten.query.filter_by(id=konten_id, user_id=current_user.id).first_or_404()
+    inv = Invoice.query.filter_by(konten_id=konten_id).first()
+    if not inv:
+        inv = Invoice(
+            konten_id=konten_id,
+            invoice_number=_next_invoice_number(current_user.id),
+            campaign_number=_next_campaign_number(current_user.id),
+            first_downloaded_at=datetime.utcnow()
+        )
+        db.session.add(inv)
+        db.session.commit()
+    elif not inv.first_downloaded_at:
+        inv.first_downloaded_at = datetime.utcnow()
+        db.session.commit()
+    items = _invoice_items_from_konten(k)
+    return jsonify({
+        'invoice_number': inv.invoice_number,
+        'campaign_number': inv.campaign_number,
+        'date': inv.first_downloaded_at.strftime('%d %B %Y') if inv.first_downloaded_at else '',
+        'creator_name': current_user.username.replace('.', ' ').title(),
+        'brand': k.brand or '—',
+        'campaign': k.campaign_project or k.judul or '',
+        'items': items,
+    })
+
+
 @app.route('/invoice/<int:konten_id>', methods=['GET'])
 @login_required
 def show_invoice(konten_id):
@@ -644,6 +674,44 @@ def show_invoice(konten_id):
     items = _invoice_items_from_konten(k)
     return render_template('invoice.html', konten=k, invoice=inv, items=items,
                            creator_name=current_user.username.replace('.', ' ').title())
+
+
+@app.route('/invoice/<int:konten_id>/pdf', methods=['GET'])
+@login_required
+def invoice_pdf(konten_id):
+    from weasyprint import HTML as WeasyHTML
+    k = Konten.query.filter_by(id=konten_id, user_id=current_user.id).first_or_404()
+    inv = Invoice.query.filter_by(konten_id=konten_id).first()
+    if not inv:
+        inv = Invoice(
+            konten_id=konten_id,
+            invoice_number=_next_invoice_number(current_user.id),
+            campaign_number=_next_campaign_number(current_user.id),
+            first_downloaded_at=datetime.utcnow()
+        )
+        db.session.add(inv)
+        db.session.commit()
+    elif not inv.first_downloaded_at:
+        inv.first_downloaded_at = datetime.utcnow()
+        db.session.commit()
+
+    items = _invoice_items_from_konten(k)
+    creator_name = current_user.username.replace('.', ' ').title()
+
+    fish_path = os.path.join(app.static_folder, 'images', 'image.png')
+    with open(fish_path, 'rb') as _f:
+        fish_b64 = 'data:image/png;base64,' + base64.b64encode(_f.read()).decode()
+
+    html_str = render_template('invoice_print.html',
+        invoice=inv, konten=k, items=items,
+        creator_name=creator_name, fish_b64=fish_b64)
+
+    pdf_bytes = WeasyHTML(string=html_str).write_pdf()
+    return Response(
+        pdf_bytes,
+        mimetype='application/pdf',
+        headers={'Content-Disposition': f'attachment; filename="{inv.invoice_number}.pdf"'}
+    )
 
 
 @app.route('/konten/buat', methods=['GET', 'POST'])

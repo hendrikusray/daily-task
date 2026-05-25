@@ -193,15 +193,28 @@
 
     var _platformOptions = {{ platform_options | tojson }};
 
+    function formatSowLabel(checked) {
+        if (!checked.length) return 'Pilih platform';
+        var limit = 26;
+        var shown = [], total = 0;
+        for (var i = 0; i < checked.length; i++) {
+            var sep = shown.length ? ', ' : '';
+            if (shown.length === 0 || total + sep.length + checked[i].length <= limit) {
+                shown.push(checked[i]); total += sep.length + checked[i].length;
+            } else break;
+        }
+        var rest = checked.length - shown.length;
+        return shown.join(', ') + (rest > 0 ? ' +' + rest : '');
+    }
+
     function sowDropHtml(checkedArr) {
         var items = _platformOptions.map(function(o) {
             var chk = (checkedArr || []).indexOf(o) > -1 ? ' checked' : '';
             return '<label class="sow-plat-opt"><input type="checkbox" class="sow-plat-cb" value="' + o + '"' + chk + ' onchange="updateSowDrop(this)"> ' + o + '</label>';
         }).join('');
-        var label = checkedArr && checkedArr.length ? checkedArr.length + ' platform' : 'Pilih platform';
         return '<div class="sow-platform-drop" data-sow-drop>' +
             '<button type="button" class="sow-drop-trigger" onclick="toggleSowDrop(this)">' +
-            '<span class="sow-drop-label">' + label + '</span><span class="sow-drop-caret">⌄</span></button>' +
+            '<span class="sow-drop-label">' + formatSowLabel(checkedArr || []) + '</span><span class="sow-drop-caret">⌄</span></button>' +
             '<div class="sow-drop-menu" hidden>' + items + '</div>' +
             '<input type="hidden" name="sow_item_platform[]" class="sow-platform-val"></div>';
     }
@@ -232,8 +245,14 @@
     function updateSowDrop(cb) {
         var drop = cb.closest('.sow-platform-drop');
         var checked = Array.from(drop.querySelectorAll('.sow-plat-cb:checked')).map(function(c) { return c.value; });
-        drop.querySelector('.sow-drop-label').textContent = checked.length ? checked.length + ' platform' : 'Pilih platform';
+        drop.querySelector('.sow-drop-label').textContent = formatSowLabel(checked);
     }
+
+    // Reformat initial labels to show actual names
+    document.querySelectorAll('[data-sow-drop]').forEach(function(drop) {
+        var checked = Array.from(drop.querySelectorAll('.sow-plat-cb:checked')).map(function(c) { return c.value; });
+        drop.querySelector('.sow-drop-label').textContent = formatSowLabel(checked);
+    });
 
     document.addEventListener('click', function(e) {
         if (!e.target.closest('[data-sow-drop]')) {

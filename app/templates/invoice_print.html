@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+@page {
+    size: A4;
+    margin: 0;
+}
+
+body {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    background-image: url('{{ fish_b64 }}');
+    background-repeat: repeat;
+    background-size: 220px;
+    margin: 0;
+    padding: 28px;
+}
+
+.inv-outer {
+    /* wrapper kept only for consistent padding; fish is on body now */
+}
+
+.inv-card {
+    background: #fdfcf7;
+    border: 4px solid #d94040;
+    border-radius: 20px;
+    padding: 40px 46px;
+}
+
+/* Creator */
+.inv-creator-name { font-size: 36px; font-weight: 900; color: #1a3a6e; letter-spacing: -0.5px; line-height: 1.1; }
+.inv-creator-sub  { font-size: 13px; color: #5a7abf; font-style: italic; margin-top: 5px; }
+
+/* Divider */
+.inv-divider { border: none; border-top: 1.5px solid #1a3a6e; margin: 20px 0; opacity: 0.18; }
+
+/* Header row */
+.inv-header-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; margin-bottom: 22px; }
+.inv-billed-label { font-size: 10px; font-weight: 900; color: #1a3a6e; text-transform: uppercase; letter-spacing: 0.08em; }
+.inv-billed-to    { font-size: 15px; font-weight: 800; color: #1a3a6e; margin-top: 4px; }
+.inv-meta { text-align: right; font-size: 12px; color: #444; line-height: 1.8; }
+.inv-meta strong  { color: #1a3a6e; }
+
+/* Table */
+.inv-table { width: 100%; border-collapse: collapse; }
+.inv-table th {
+    font-size: 10px; font-weight: 900; color: #1a3a6e; text-transform: uppercase;
+    letter-spacing: 0.07em; padding: 9px 12px; border-bottom: 2px solid #1a3a6e; text-align: left;
+}
+.inv-table th.right, .inv-table td.right { text-align: right; }
+.inv-table th.center, .inv-table td.center { text-align: center; }
+.inv-table td {
+    padding: 10px 12px; font-size: 13px;
+    border-bottom: 1px solid rgba(26,58,110,0.09); vertical-align: middle;
+}
+.inv-table tfoot td { padding: 12px 12px; border-bottom: none; border-top: 2px solid rgba(26,58,110,0.15); }
+.inv-subtotal-label { text-align: right; color: #666; font-size: 12px; font-weight: 700; }
+.inv-subtotal-val   { text-align: right; font-size: 17px; font-weight: 900; color: #1a3a6e; }
+
+/* Footer */
+.inv-footer-row { display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; margin-top: 30px; }
+.inv-footer-left  { flex: 1; min-width: 0; }
+.inv-terms h4 { font-size: 10px; font-weight: 900; color: #1a3a6e; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 5px; }
+.inv-terms ul { padding-left: 14px; font-size: 11px; color: #555; line-height: 1.9; }
+.inv-thankyou { font-size: 26px; font-weight: 900; color: #1a3a6e; margin-top: 16px; }
+.inv-payment { text-align: right; font-size: 12px; color: #444; line-height: 1.8; flex-shrink: 0; }
+.inv-payment strong { font-size: 10px; font-weight: 900; color: #1a3a6e; text-transform: uppercase; letter-spacing: 0.08em; display: block; margin-bottom: 4px; }
+</style>
+</head>
+<body>
+
+<div class="inv-outer">
+    <div class="inv-card">
+
+        <div class="inv-creator-name">{{ creator_name }}</div>
+        <div class="inv-creator-sub">content creator</div>
+
+        <hr class="inv-divider" style="margin-top:20px;">
+
+        <div class="inv-header-row">
+            <div>
+                <div class="inv-billed-label">Billed To:</div>
+                <div class="inv-billed-to">{{ konten.brand or '—' }}</div>
+            </div>
+            <div class="inv-meta">
+                <div><strong>{{ invoice.invoice_number }}</strong></div>
+                <div><strong>Campaign #{{ invoice.campaign_number }}</strong></div>
+                <div>{{ invoice.first_downloaded_at.strftime('%B %d, %Y') if invoice.first_downloaded_at else '' }}</div>
+            </div>
+        </div>
+
+        <hr class="inv-divider">
+
+        <table class="inv-table">
+            <thead>
+                <tr>
+                    <th>Description</th>
+                    <th>Platform</th>
+                    <th class="center">Qty</th>
+                    <th class="right">Rate</th>
+                    <th class="right">Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% set subtotal = namespace(val=0) %}
+                {% for item in items %}
+                {% set row_total = item.qty * item.rate %}
+                {% set subtotal.val = subtotal.val + row_total %}
+                <tr>
+                    <td>{{ item.text }}</td>
+                    <td>{{ item.platform }}</td>
+                    <td class="center">{{ item.qty }}</td>
+                    <td class="right">{{ item.rate | idr }}</td>
+                    <td class="right">{{ row_total | idr }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="3"></td>
+                    <td class="inv-subtotal-label">Subtotal</td>
+                    <td class="inv-subtotal-val">{{ subtotal.val | idr }}</td>
+                </tr>
+            </tfoot>
+        </table>
+
+        <hr class="inv-divider" style="margin-top:24px;">
+
+        <div class="inv-footer-row">
+            <div class="inv-footer-left">
+                <div class="inv-terms">
+                    <h4>Terms &amp; Conditions</h4>
+                    <ul>
+                        <li>Exclude tax</li>
+                        <li>Exclude bank admin fee</li>
+                        <li>Payment term: <strong>Maximum H+14</strong> after final content posted.</li>
+                    </ul>
+                </div>
+                <div class="inv-thankyou">Thank you!</div>
+            </div>
+            <div class="inv-payment">
+                <strong>Payment Information</strong>
+                Bank Jago<br>
+                Account Name: Yohanna Juanita Kusuma Ningrum<br>
+                Account No.: 1042-3759-2681
+            </div>
+        </div>
+
+    </div>
+</div>
+
+</body>
+</html>

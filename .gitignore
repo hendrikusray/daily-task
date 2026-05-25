@@ -60,3 +60,6 @@ logs/
 # OS
 .DS_Store
 Thumbs.db
+app/static/images/*.png
+app/static/images/*.jpg
+app/static/images/*.jpeg
