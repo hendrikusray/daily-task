@@ -2,6 +2,7 @@ import os
 import re
 import uuid
 import base64
+import json
 from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify, Response
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
@@ -212,7 +213,7 @@ def fromjson_filter(s):
     if not s:
         return []
     try:
-        return _json.loads(s)
+        return json.loads(s)
     except Exception:
         return []
 
@@ -244,7 +245,7 @@ def apply_tracker_form(konten):
         p = sow_platforms[i].strip() if i < len(sow_platforms) else ''
         if t or p:
             items.append({'text': t, 'platform': p, 'qty': 1})
-    konten.sow_items = _json.dumps(items) if items else None
+    konten.sow_items = json.dumps(items) if items else None
     konten.sow = items[0]['text'] if items else ''
     seen = []
     for it in items:
@@ -619,7 +620,7 @@ def _next_campaign_number(user_id):
 def _invoice_items_from_konten(konten):
     rate = parse_fee(konten.fee) if is_finished_status(konten.status) else 0
     if konten.sow_items:
-        raw = _json.loads(konten.sow_items)
+        raw = json.loads(konten.sow_items)
         return [{'text': it.get('text', ''), 'platform': it.get('platform', ''),
                  'qty': it.get('qty', 1), 'rate': rate} for it in raw]
     return [{'text': konten.sow or '', 'platform': konten.platform or '', 'qty': 1, 'rate': rate}]
